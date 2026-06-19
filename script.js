@@ -128,17 +128,16 @@ const portals = [
   },
 ];
 
-/* one bright accent colour at a time — picked fresh every run */
+/* one bold flat accent colour at a time — picked fresh every run */
 const accents = [
-  "#2fe1ff",
-  "#ff2fd6",
-  "#ffe45e",
-  "#7dff8a",
-  "#ff5e3a",
-  "#b967ff",
+  "#ffe14d",
+  "#ff5b3d",
+  "#3df2a4",
+  "#5ad1ff",
+  "#ff4fae",
 ];
 
-/* ---------- canvas fx (flat geometric shapes, single accent colour) ---------- */
+/* ---------- canvas fx: a single one-shot burst, fired only on "explode" ---------- */
 
 const canvas = document.getElementById("fx-canvas");
 const ctx = canvas ? canvas.getContext("2d") : null;
@@ -152,122 +151,50 @@ resize();
 window.addEventListener("resize", resize);
 
 let particles = [];
-let fxRunning = false;
 let fxToken = 0;
 
-function spawnSquares(color, count = 26){
-  for (let i = 0; i < count; i++){
-    particles.push({
-      type: "square",
-      x: Math.random() * canvas.width,
-      y: -20 - Math.random() * canvas.height * 0.6,
-      vy: 1.4 + Math.random() * 2.6,
-      size: 6 + Math.random() * 10,
-      rot: Math.random() * 360,
-      vr: (Math.random() - 0.5) * 6,
-      color,
-    });
-  }
-}
-
-function spawnDots(color, count = 40){
+function spawnBurst(color, count = 22){
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
   for (let i = 0; i < count; i++){
     const angle = Math.random() * Math.PI * 2;
-    const speed = 2 + Math.random() * 6;
+    const speed = 3 + Math.random() * 9;
     particles.push({
-      type: "dot",
       x: cx,
       y: cy,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      life: 50 + Math.random() * 30,
-      maxLife: 80,
-      size: 2 + Math.random() * 2,
+      rot: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 14,
+      life: 26 + Math.random() * 14,
+      maxLife: 40,
+      size: 5 + Math.random() * 9,
       color,
     });
   }
 }
 
-function spawnLines(color, count = 5){
-  for (let i = 0; i < count; i++){
-    particles.push({
-      type: "line",
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.6,
-      vy: (Math.random() - 0.5) * 0.6,
-      len: 30 + Math.random() * 60,
-      angle: Math.random() * Math.PI,
-      opacity: 0.12 + Math.random() * 0.1,
-      color,
-    });
-  }
-}
-
-let scanY = -1;
-function drawScan(color){
-  if (scanY < 0) return;
-  ctx.save();
-  ctx.globalAlpha = 0.5;
-  ctx.fillStyle = color;
-  ctx.fillRect(0, scanY, canvas.width, 2);
-  ctx.restore();
-  scanY += 9;
-  if (scanY > canvas.height) scanY = -1;
-}
-
-function tick(mode, color, token){
-  if (!fxRunning || token !== fxToken || !canvas) return;
+function tick(token){
+  if (token !== fxToken || !canvas) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (mode === "scan") drawScan(color);
-
   particles.forEach(p => {
-    if (p.type === "square"){
-      p.y += p.vy;
-      p.rot += p.vr;
-      if (p.y > canvas.height + 20) p.y = -20;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate((p.rot * Math.PI) / 180);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-      ctx.restore();
-    }
-    if (p.type === "dot"){
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life--;
-      ctx.save();
-      ctx.globalAlpha = Math.max(p.life / p.maxLife, 0);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
-      ctx.restore();
-    }
-    if (p.type === "line"){
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = canvas.width;
-      if (p.x > canvas.width) p.x = 0;
-      if (p.y < 0) p.y = canvas.height;
-      if (p.y > canvas.height) p.y = 0;
-      ctx.save();
-      ctx.globalAlpha = p.opacity;
-      ctx.strokeStyle = p.color;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      ctx.lineTo(p.x + Math.cos(p.angle) * p.len, p.y + Math.sin(p.angle) * p.len);
-      ctx.stroke();
-      ctx.restore();
-    }
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+    p.life--;
+    ctx.save();
+    ctx.globalAlpha = Math.max(p.life / p.maxLife, 0);
+    ctx.translate(p.x, p.y);
+    ctx.rotate((p.rot * Math.PI) / 180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    ctx.restore();
   });
 
-  particles = particles.filter(p => !(p.type === "dot" && p.life <= 0));
+  particles = particles.filter(p => p.life > 0);
 
-  requestAnimationFrame(() => tick(mode, color, token));
+  if (particles.length) requestAnimationFrame(() => tick(token));
 }
 
 /* ---------- typewriter ---------- */
@@ -296,43 +223,52 @@ function typeWriter(el, text, runId, speed = 22){
   }, speed);
 }
 
-/* ---------- modes ---------- */
+/* ---------- card entrance modes ---------- */
 
-const modeNames = ["pop", "slide", "stamp", "scan", "squares", "dots"];
+const cardModes = ["drop", "shake", "explode", "fly", "fade"];
+const flyOrigins = [
+  { x: "-130vw", y: "-40vh", r: "-50deg" },
+  { x: "130vw", y: "-30vh", r: "55deg" },
+  { x: "-110vw", y: "60vh", r: "60deg" },
+  { x: "120vw", y: "70vh", r: "-65deg" },
+  { x: "0vw", y: "-140vh", r: "40deg" },
+];
 
-function applyVisualMode(mode, color, messageEl, token){
+function applyCardAnimation(mode, color, card){
   document.body.style.setProperty("--accent", color);
   particles = [];
-  scanY = -1;
+
+  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "pulse-glow");
+  card.style.removeProperty("--fly-x");
+  card.style.removeProperty("--fly-y");
+  card.style.removeProperty("--fly-r");
 
   switch (mode){
-    case "pop":
-      messageEl.classList.add("pop-in");
-      spawnLines(color, 3);
+    case "drop":
+      card.classList.add("card-drop");
       break;
-    case "slide":
-      messageEl.classList.add("slide-up");
-      spawnLines(color, 4);
+    case "shake":
+      card.classList.add("card-shake");
       break;
-    case "stamp":
-      messageEl.classList.add("stamp");
-      document.getElementById("card")?.classList.add("pulse-glow");
+    case "explode":
+      card.classList.add("card-explode");
+      card.classList.add("pulse-glow");
+      spawnBurst(color);
+      fxToken++;
+      tick(fxToken);
       break;
-    case "scan":
-      messageEl.classList.add("pop-in");
-      scanY = 0;
+    case "fly": {
+      const origin = randomItem(flyOrigins);
+      card.style.setProperty("--fly-x", origin.x);
+      card.style.setProperty("--fly-y", origin.y);
+      card.style.setProperty("--fly-r", origin.r);
+      card.classList.add("card-fly");
       break;
-    case "squares":
-      messageEl.classList.add("pop-in");
-      spawnSquares(color);
-      break;
-    case "dots":
-      messageEl.classList.add("pop-in");
-      spawnDots(color);
+    }
+    case "fade":
+      card.classList.add("card-fade");
       break;
   }
-
-  tick(mode, color, token);
 }
 
 let currentRunId = 0;
@@ -351,39 +287,39 @@ function run(){
   }
 
   particles = [];
-  fxRunning = true;
-  fxToken++;
-  const token = fxToken;
 
   const color = randomItem(accents);
-  const mode = randomItem(modeNames);
+  const mode = randomItem(cardModes);
   const isPortal = Math.random() < 0.32;
   const portal = isPortal ? randomItem(portals) : null;
   const text = portal ? portal.tagline : buildMessage();
 
   const portalBtn = document.getElementById("portal-btn");
   const card = document.getElementById("card");
+  if (!card) return;
 
-  messageEl.className = "";
-  card?.classList.remove("pulse-glow");
+  messageEl.textContent = "";
 
   if (portalBtn){
     portalBtn.classList.remove("show", "btn-pop");
   }
 
-  typeWriter(messageEl, text, runId);
+  /* card flies/drops/shakes/explodes/fades into place first, text types
+     in right after it settles so the motion reads clearly before the
+     message competes for attention */
+  applyCardAnimation(mode, color, card);
 
   pendingVisualTimeout = setTimeout(() => {
     if (runId !== currentRunId) return;
 
-    applyVisualMode(mode, color, messageEl, token);
+    typeWriter(messageEl, text, runId);
 
     if (portal && portalBtn){
       portalBtn.textContent = portal.label;
       portalBtn.href = portal.url;
       portalBtn.classList.add("show", "btn-pop");
     }
-  }, text.length * 22 + 80);
+  }, 520);
 }
 
 function safeRun(){
