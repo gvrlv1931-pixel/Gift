@@ -1,105 +1,77 @@
-/* ---------- message generator ---------- */
+/* ---------- message pool ---------- */
 
-const openings = [
-  "BREAKING: the universe just confirmed",
-  "A council of stray cats has ruled that",
-  "This sticker legally requires you to know",
-  "Plot twist —",
-  "Field report from the chaos department:",
-  "The moon texted ahead to say",
-  "An anonymous disco ball reports",
-  "Scientifically, emotionally, and dramatically speaking,",
-  "URGENT TRANSMISSION:",
-  "Your villain origin story begins with",
-  "A very serious tribunal has decided",
-  "Somewhere a guitar solo is happening because",
-  "This is not a drill, it's worse:",
-  "The glitter in this room insists that",
+const lines = [
+  // unhinged / generic punchy
+  "You're dangerously close to becoming a legend tonight.",
+  "Crank the volume. Start a small, tasteful riot.",
+  "Your aura currently reads: do not approach, mid glow-up.",
+  "Go misbehave somewhere with good lighting.",
+  "Today's forecast: chaos, charisma, zero regrets.",
+  "You're one bad decision away from a great story.",
+  "Act like the bouncer owes you a favour.",
+  "Loud shirt energy. Wear it like armour.",
+  "Somebody just got nervous because you walked in.",
+  "Main character. No notes.",
+  "You woke up and chose violence (the fun kind).",
+
+  // wetherspoons / notice
+  "Hand in that Wetherspoons notice the second London says yes.",
+  "You run that pub like it owes you money. Soon it won't matter.",
+  "One more shift. One less excuse. Then it's London.",
+  "Rack 'em up — you were always better at pool than pulling pints.",
+  "An MSc in International Business Management, serving pints anyway. Range.",
+  "Pot the black, hand in the notice, book the train.",
+  "You'll leave that bar with better stories than tips.",
+  "The second London confirms, that notice is in the post.",
+
+  // masters / graduation / london
+  "Graduation's coming. So is your villain era.",
+  "London's getting a guy who looks better than the skyline.",
+  "Your future London flat is nervous about the hair product moving in.",
+  "Soon: London. For now: just look unfairly good doing last orders.",
+  "A very official certificate is being printed. Try to look surprised.",
+  "London called. Bring the good jacket and the personality.",
+
+  // climbing / hiking / city boy
+  "That mountain gear's seen more wardrobes than mountains.",
+  "City boy who owns a carabiner. Iconic, frankly.",
+  "The hills are still waiting. So's your hairdryer.",
+  "Hiking boots: bought. Hikes attended: questionable. Style: immaculate.",
+  "Somewhere a climbing wall is gently disappointed. It still thinks you're hot.",
+  "You'll get up that mountain eventually. Probably. Maybe.",
+
+  // hair / compliments / looking good
+  "Your hair did more work today than the whole bar shift.",
+  "Breaking: your hair looked incredible and nobody told you. Now they have.",
+  "Your hair has filed for overtime pay. Pay up.",
+  "Someone should be complimenting you right now. Consider this that.",
+  "You looked good today. Annoyingly good, actually.",
+
+  // pool
+  "Somewhere a cue ball is nervous. You're on form tonight.",
+  "Pool table's the only thing in that pub you've ever truly respected.",
+  "Break the rack like you broke the routine.",
+  "Two cushions, one pocket, zero doubt. Pot it.",
 ];
 
-const subjects = [
-  "you",
-  "your weird beautiful brain",
-  "the person reading this",
-  "whoever's holding this phone right now",
-  "you, specifically and unapologetically",
-  "the legend tapping their phone on a sticker",
-];
-
-const actions = [
-  "are doing way better than you think",
-  "owe yourself a ridiculous treat today",
-  "should dance badly in your kitchen tonight",
-  "are allowed to be a little too much",
-  "need to text someone something unhinged and kind",
-  "are the main character of an extremely chaotic indie film",
-  "should crank the volume up a notch louder than is socially acceptable",
-  "have permission to be dramatic about something small today",
-  "are a glorious disaster and that's the brand",
-  "deserve fries, immediately, no negotiation",
-  "should pick a fight with a vending machine and lose gracefully",
-  "are radiating main-character chaos energy right now",
-  "should go outside and yell at a cloud for fun",
-  "have unfinished business with greatness",
-  "are entirely too cool for whatever you're worried about",
-];
-
-const endings = [
-  "No further questions.",
-  "This message will not self-destruct, unfortunately.",
-  "Filed under: extremely true.",
-  "Tell no one. Or everyone. Be wild about it.",
-  "Signed in glitter pen, sealed with attitude.",
-  "The drums hit harder after this message.",
-  "Stickered. Sealed. Slightly cursed. Delivered with love.",
-  "End transmission. Mosh responsibly.",
-  "Approved by absolutely nobody official.",
-  "Go forth and be insufferable in a good way.",
-];
-
-const personalLines = [
-  "Last orders have been called on your old life — London's already pouring the next round.",
-  "Somewhere a real mountain is filing a formal complaint because you said you'd hike it and then, predictably, did not.",
-  "Your masters degree is staging a small intervention: 'graduate already and stop alphabetising the bar fridge.'",
-  "The crystal pint glass foresees one (1) hair flip so devastating it briefly changes the weather over London.",
-  "You moved in with your mate 'just for a bit' — the office sweepstake on how long 'a bit' actually means is heating up.",
-  "Somewhere, a climbing wall is gently disappointed in you for skipping leg day again. It still thinks you're hot though.",
-  "Breaking news: your hair looked genuinely incredible today and absolutely nobody told you. Consider this the official notice.",
-  "You will manage one (1) Wetherspoons shift today with the quiet, unreasonable dignity of a man with an International Business Management masters.",
-  "London is currently rehearsing how to handle how good you're about to look walking around it.",
-  "A wandering hiking boot, still pristine in its box, sends its regards and mild disappointment.",
-  "The Department of Compliments has approved an emergency dispatch: your hair is doing something incredible right now, act accordingly.",
-  "You're a city boy who owns proper hiking gear purely as a personality prop. The mountains know. They forgive you anyway.",
-  "Somewhere a pint glass clinks itself in celebration — one step closer to London, one step closer to whatever's next.",
-  "The Oracle of Last Orders has spoken: pulling pints today is beneath you and you both know it.",
-  "Your future London flat is already nervous about how much hair product is about to move in.",
-  "A fortune scrawled on a Wetherspoons beer mat predicts: graduation is coming, and so is your villain era.",
-  "Somewhere a colleague's spare room is being prepared. It has no idea what it's signed up for.",
-  "The hills you keep almost-climbing have asked the city to send you back when you're ready. No rush. Bring snacks.",
-  "An International Business Management degree walks into a pub it also happens to manage. The pub is intimidated.",
-  "Your hair has filed for overtime pay given how much work it's been putting in lately. Pay up.",
-  "London called. It wants to know if you're bringing the good jacket or just the personality. Bring both.",
-  "Somewhere a carabiner clips itself shut in solidarity — you'll get up that mountain eventually, probably, maybe.",
-  "You give off main-character energy in a building that primarily serves jugs of cheap lager. Respect.",
-  "A very official-looking certificate is being printed somewhere with your name on it. Try to look surprised.",
-];
-
-const signatures = [
-  "— sent via duct tape & defiance",
-  "— with love, chaos, and bad decisions",
-  "— from the desk of nobody important",
-  "— powered by spite and snacks",
-  "— certified 100% unhinged",
-  "— stamped by a very tired moth",
+const tags = [
+  "No notes.",
+  "Mic drop.",
+  "Scene.",
+  "Final answer.",
+  "Receipts only.",
+  "End of.",
+  "",
+  "",
+  "",
 ];
 
 function randomItem(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
 function buildMessage(){
-  if (Math.random() < 0.5){
-    return `${randomItem(personalLines)} ${randomItem(endings)}`;
-  }
-  return `${randomItem(openings)} ${randomItem(subjects)} ${randomItem(actions)}. ${randomItem(endings)}`;
+  const tag = randomItem(tags);
+  const line = randomItem(lines);
+  return tag ? `${line} ${tag}` : line;
 }
 
 const palettes = [
@@ -123,9 +95,8 @@ resize();
 window.addEventListener("resize", resize);
 
 let particles = [];
-let fxRunning = true;
 
-function spawnConfetti(colors, count = 140){
+function spawnConfetti(colors, count = 90){
   for (let i = 0; i < count; i++){
     particles.push({
       type: "confetti",
@@ -141,12 +112,12 @@ function spawnConfetti(colors, count = 140){
   }
 }
 
-function spawnSparks(colors, count = 90){
+function spawnSparks(colors, count = 70){
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
   for (let i = 0; i < count; i++){
     const angle = Math.random() * Math.PI * 2;
-    const speed = 2 + Math.random() * 9;
+    const speed = 2 + Math.random() * 8;
     particles.push({
       type: "spark",
       x: cx,
@@ -161,17 +132,17 @@ function spawnSparks(colors, count = 90){
   }
 }
 
-function spawnBlobs(colors, count = 7){
+function spawnBlobs(colors, count = 6){
   for (let i = 0; i < count; i++){
     particles.push({
       type: "blob",
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.6,
-      vy: (Math.random() - 0.5) * 0.6,
-      size: 80 + Math.random() * 180,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      size: 70 + Math.random() * 160,
       color: randomItem(colors),
-      opacity: 0.18 + Math.random() * 0.12,
+      opacity: 0.14 + Math.random() * 0.1,
     });
   }
 }
@@ -179,15 +150,17 @@ function spawnBlobs(colors, count = 7){
 let lightningTimer = 0;
 function maybeLightning(colors){
   lightningTimer--;
-  if (lightningTimer <= 0 && Math.random() < 0.015){
+  if (lightningTimer <= 0 && Math.random() < 0.012){
     ctx.save();
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.28;
     ctx.fillStyle = randomItem(colors);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
     lightningTimer = 30;
   }
 }
+
+let fxRunning = true;
 
 function tick(mode, colors){
   if (!fxRunning) return;
@@ -246,7 +219,7 @@ function tick(mode, colors){
 
 /* ---------- typewriter ---------- */
 
-function typeWriter(el, text, speed = 22){
+function typeWriter(el, text, speed = 24){
   el.textContent = "";
   let i = 0;
   const timer = setInterval(() => {
@@ -258,7 +231,7 @@ function typeWriter(el, text, speed = 22){
 
 /* ---------- modes ---------- */
 
-const modeNames = ["confetti", "sparks", "blobs", "lightning", "glitch", "vinyl"];
+const modeNames = ["confetti", "sparks", "blobs", "lightning", "glitch", "stamp"];
 
 function applyVisualMode(mode, colors, messageEl){
   document.body.style.setProperty("--accent", colors[0]);
@@ -286,9 +259,9 @@ function applyVisualMode(mode, colors, messageEl){
       messageEl.classList.add("glitch-wrap");
       messageEl.setAttribute("data-text", messageEl.textContent);
       break;
-    case "vinyl":
+    case "stamp":
       spawnBlobs(colors, 5);
-      messageEl.classList.add("spin");
+      messageEl.classList.add("stamp");
       break;
   }
 
@@ -303,24 +276,17 @@ function run(){
   const mode = randomItem(modeNames);
   const text = buildMessage();
 
-  const caseNumber = Math.floor(Math.random() * 90000) + 10000;
-  document.getElementById("case").textContent = `CASE #${caseNumber} — MODE: ${mode.toUpperCase()}`;
-
   const messageEl = document.getElementById("message");
   messageEl.className = "";
   messageEl.removeAttribute("data-text");
   messageEl.style.color = colors[0];
-
-  document.getElementById("sign").textContent = randomItem(signatures);
 
   typeWriter(messageEl, text);
 
   setTimeout(() => {
     if (mode === "glitch") messageEl.setAttribute("data-text", text);
     applyVisualMode(mode, colors, messageEl);
-  }, text.length * 22 + 80);
+  }, text.length * 24 + 80);
 }
-
-document.getElementById("again").addEventListener("click", run);
 
 run();
