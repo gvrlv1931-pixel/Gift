@@ -236,11 +236,19 @@ function tick(mode, color, token){
 
 let typeTimer = null;
 
-function typeWriter(el, text, speed = 22){
+/* runId guards against a stale, in-flight typewriter still ticking
+   after a newer run() has already started (e.g. two resume events
+   firing back-to-back on a phone). Stale ticks become no-ops. */
+function typeWriter(el, text, runId, speed = 22){
   if (typeTimer) clearInterval(typeTimer);
   el.textContent = "";
   let i = 0;
   typeTimer = setInterval(() => {
+    if (runId !== currentRunId){
+      clearInterval(typeTimer);
+      typeTimer = null;
+      return;
+    }
     el.textContent += text.charAt(i);
     i++;
     if (i >= text.length){
@@ -289,9 +297,20 @@ function applyVisualMode(mode, color, messageEl, token){
   tick(mode, color, token);
 }
 
+let currentRunId = 0;
+let pendingVisualTimeout = null;
+
 function run(){
   const messageEl = document.getElementById("message");
   if (!messageEl) return;
+
+  currentRunId++;
+  const runId = currentRunId;
+
+  if (pendingVisualTimeout){
+    clearTimeout(pendingVisualTimeout);
+    pendingVisualTimeout = null;
+  }
 
   particles = [];
   fxRunning = true;
@@ -314,9 +333,11 @@ function run(){
     portalBtn.classList.remove("show", "btn-pop");
   }
 
-  typeWriter(messageEl, text);
+  typeWriter(messageEl, text, runId);
 
-  setTimeout(() => {
+  pendingVisualTimeout = setTimeout(() => {
+    if (runId !== currentRunId) return;
+
     applyVisualMode(mode, color, messageEl, token);
 
     if (portal && portalBtn){
@@ -342,9 +363,20 @@ safeRun();
 /* Phones often resume an already-open tab on NFC tap instead of doing a
    fresh navigation, and some browsers restore the page from the
    back/forward cache without re-running scripts. Re-roll whenever the
-   page becomes visible again so every tap feels like a new transmission. */
+   page becomes visible again so every tap feels like a new transmission.
+   pageshow and visibilitychange can both fire for the same resume, so
+   debounce them into a single re-roll. */
+let resumeDebounce = null;
+function scheduleResume(){
+  if (resumeDebounce) clearTimeout(resumeDebounce);
+  resumeDebounce = setTimeout(() => {
+    resumeDebounce = null;
+    safeRun();
+  }, 80);
+}
+
 window.addEventListener("pageshow", (e) => {
-  if (e.persisted) safeRun();
+  if (e.persisted) scheduleResume();
 });
 
 let lastHiddenAt = 0;
@@ -352,6 +384,6 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden"){
     lastHiddenAt = Date.now();
   } else if (document.visibilityState === "visible" && lastHiddenAt){
-    safeRun();
+    scheduleResume();
   }
 });
