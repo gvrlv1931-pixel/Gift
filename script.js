@@ -300,6 +300,12 @@ function run(){
   const card = document.getElementById("card");
   if (!card) return;
 
+  const tagEl = document.getElementById("card-tag");
+  if (tagEl){
+    const id = Math.floor(Math.random() * 0xfff).toString(16).toUpperCase().padStart(3, "0");
+    tagEl.textContent = `TX_${id}`;
+  }
+
   messageEl.textContent = "";
 
   if (portalBtn){

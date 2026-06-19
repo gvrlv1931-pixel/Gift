@@ -75,50 +75,38 @@ body::after{
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:22px;
-    padding:54px 30px 44px;
+    gap:24px;
+    padding:52px 30px 42px;
     background:var(--accent);
     border:4px solid var(--ink);
-    border-radius:4px;
-    clip-path:polygon(0 0, 97% 0, 100% 6%, 100% 100%, 4% 100%, 0 93%);
+    clip-path:polygon(0 0, 92% 0, 100% 14%, 100% 100%, 0 100%);
     box-shadow:
-        0 0 0 2px var(--line) inset,
         10px 10px 0 var(--line),
         0 24px 60px rgba(0,0,0,.65);
     will-change:transform, opacity;
-    background-image:radial-gradient(rgba(13,13,14,.07) 1.4px, transparent 1.4px);
-    background-size:13px 13px;
 }
 
-.tape{
+.tag{
     position:absolute;
-    top:-16px;
-    width:84px;
-    height:30px;
-    background:var(--paper);
-    opacity:.92;
-    box-shadow:0 3px 6px rgba(0,0,0,.3);
+    top:14px;
+    left:16px;
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:.7rem;
+    letter-spacing:1.5px;
+    color:var(--ink);
+    opacity:.55;
 }
-.tape::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background-repeat:repeat;
-    background-image:repeating-linear-gradient(45deg, rgba(13,13,14,.06) 0 2px, transparent 2px 8px);
-}
-.tape-l{ left:18px; transform:rotate(-7deg); }
-.tape-r{ right:14px; transform:rotate(5deg); }
 
-.badge{
+.chip{
     position:absolute;
-    top:-30px;
-    right:-22px;
-    width:64px;
-    height:64px;
-    transform:rotate(12deg);
-    filter:drop-shadow(0 4px 0 rgba(0,0,0,.3));
+    top:0;
+    right:0;
+    width:34px;
+    height:34px;
+    background:var(--ink);
+    clip-path:polygon(100% 0, 0 0, 100% 100%);
 }
-.badge svg{ width:100%; height:100%; fill:var(--line); stroke:var(--ink); stroke-width:3; }
 
 #message{
     margin:0;
@@ -133,18 +121,6 @@ body::after{
     word-wrap:break-word;
 }
 
-.scribble{
-    width:140px;
-    height:14px;
-    margin-top:-10px;
-}
-.scribble path{
-    fill:none;
-    stroke:var(--ink);
-    stroke-width:4;
-    stroke-linecap:round;
-}
-
 #portal-btn{
     display:none;
     text-decoration:none;
@@ -156,7 +132,6 @@ body::after{
     color:var(--accent);
     background:var(--ink);
     padding:16px 22px;
-    border-radius:2px;
     border:3px solid var(--ink);
     text-align:center;
     min-width:min(85%, 300px);
