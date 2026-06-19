@@ -127,13 +127,14 @@ const portals = [
   },
 ];
 
-/* one bold flat accent colour at a time — picked fresh every run */
-const accents = [
-  "#ffe14d",
-  "#ff5b3d",
-  "#3df2a4",
-  "#5ad1ff",
-  "#ff4fae",
+/* bold flat colour duos — card fill + a contrasting line/shadow colour,
+   picked fresh every run, Oatly-style colour blocking */
+const accentDuos = [
+  { fill: "#ffe14d", line: "#ff5b3d" },
+  { fill: "#ff5b3d", line: "#ffe14d" },
+  { fill: "#3df2a4", line: "#ff4fae" },
+  { fill: "#5ad1ff", line: "#ff5b3d" },
+  { fill: "#ff4fae", line: "#3df2a4" },
 ];
 
 /* ---------- canvas fx: a single one-shot burst, fired only on "explode" ---------- */
@@ -233,8 +234,9 @@ const flyOrigins = [
   { x: "0vw", y: "-140vh", r: "40deg" },
 ];
 
-function applyCardAnimation(mode, color, card){
-  document.body.style.setProperty("--accent", color);
+function applyCardAnimation(mode, duo, card){
+  document.body.style.setProperty("--accent", duo.fill);
+  document.body.style.setProperty("--line", duo.line);
   particles = [];
 
   card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "pulse-glow");
@@ -252,7 +254,7 @@ function applyCardAnimation(mode, color, card){
     case "explode":
       card.classList.add("card-explode");
       card.classList.add("pulse-glow");
-      spawnBurst(color);
+      spawnBurst(duo.line);
       fxToken++;
       tick(fxToken);
       break;
@@ -287,7 +289,7 @@ function run(){
 
   particles = [];
 
-  const color = randomItem(accents);
+  const duo = randomItem(accentDuos);
   const mode = randomItem(cardModes);
   const isPortal = Math.random() < 0.32;
   const portal = isPortal ? randomItem(portals) : null;
@@ -306,7 +308,7 @@ function run(){
   /* card flies/drops/shakes/explodes/fades into place first, text types
      in right after it settles so the motion reads clearly before the
      message competes for attention */
-  applyCardAnimation(mode, color, card);
+  applyCardAnimation(mode, duo, card);
 
   pendingVisualTimeout = setTimeout(() => {
     if (runId !== currentRunId) return;
