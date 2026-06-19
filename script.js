@@ -1,147 +1,296 @@
+/* ---------- message generator ---------- */
+
 const openings = [
-"Adventure has been detected",
-"The mountain reports",
-"A future version of you confirms",
-"The Department has approved",
-"An audit of your plans revealed",
-"The city would like to inform you",
-"After careful review",
-"A wandering pigeon has determined",
-"Your next chapter requires",
-"Control systems report"
+  "BREAKING: the universe just confirmed",
+  "A council of stray cats has ruled that",
+  "This sticker legally requires you to know",
+  "Plot twist —",
+  "Field report from the chaos department:",
+  "The moon texted ahead to say",
+  "An anonymous disco ball reports",
+  "Scientifically, emotionally, and dramatically speaking,",
+  "URGENT TRANSMISSION:",
+  "Your villain origin story begins with",
+  "A very serious tribunal has decided",
+  "Somewhere a guitar solo is happening because",
+  "This is not a drill, it's worse:",
+  "The glitter in this room insists that",
+];
+
+const subjects = [
+  "you",
+  "your weird beautiful brain",
+  "the person reading this",
+  "whoever's holding this phone right now",
+  "you, specifically and unapologetically",
+  "the legend tapping their phone on a sticker",
 ];
 
 const actions = [
-"one unnecessary detour",
-"a spontaneous decision",
-"more curiosity",
-"less optimisation",
-"one moment of awe",
-"a questionable shortcut",
-"one conversation with a stranger",
-"a scenic route",
-"one tiny rebellion",
-"an unexpected adventure",
-"more trust in yourself",
-"slightly less planning",
-"a pause before solving everything"
+  "are doing way better than you think",
+  "owe yourself a ridiculous treat today",
+  "should dance badly in your kitchen tonight",
+  "are allowed to be a little too much",
+  "need to text someone something unhinged and kind",
+  "are the main character of an extremely chaotic indie film",
+  "should crank the volume up a notch louder than is socially acceptable",
+  "have permission to be dramatic about something small today",
+  "are a glorious disaster and that's the brand",
+  "deserve fries, immediately, no negotiation",
+  "should pick a fight with a vending machine and lose gracefully",
+  "are radiating main-character chaos energy right now",
+  "should go outside and yell at a cloud for fun",
+  "have unfinished business with greatness",
+  "are entirely too cool for whatever you're worried about",
 ];
 
 const endings = [
-"Proceed accordingly.",
-"This is not a drill.",
-"The paperwork has already been filed.",
-"No further explanation will be provided.",
-"The mountain seems confident about this.",
-"Good luck.",
-"Resistance is unnecessary.",
-"The city approves.",
-"Your future self says thanks.",
-"Expiry: midnight."
+  "No further questions.",
+  "This message will not self-destruct, unfortunately.",
+  "Filed under: extremely true.",
+  "Tell no one. Or everyone. Be wild about it.",
+  "Signed in glitter pen, sealed with attitude.",
+  "The drums hit harder after this message.",
+  "Stickered. Sealed. Slightly cursed. Delivered with love.",
+  "End transmission. Mosh responsibly.",
+  "Approved by absolutely nobody official.",
+  "Go forth and be insufferable in a good way.",
 ];
 
-const colors = [
-"#00E5FF",
-"#FF6EC7",
-"#FFE45E",
-"#7DFF8A",
-"#FFFFFF"
+const signatures = [
+  "— sent via duct tape & defiance",
+  "— with love, chaos, and bad decisions",
+  "— from the desk of nobody important",
+  "— powered by spite and snacks",
+  "— certified 100% unhinged",
+  "— stamped by a very tired moth",
 ];
 
-function randomItem(array) {
-return array[Math.floor(Math.random() * array.length)];
+function randomItem(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+function buildMessage(){
+  return `${randomItem(openings)} ${randomItem(subjects)} ${randomItem(actions)}. ${randomItem(endings)}`;
 }
 
-const color = randomItem(colors);
+const palettes = [
+  ["#ff2fd6", "#2fe1ff", "#ffe45e"],
+  ["#ff5e3a", "#ffe45e", "#7dff8a"],
+  ["#7dff8a", "#2fe1ff", "#ff2fd6"],
+  ["#ffe45e", "#ff5e3a", "#2fe1ff"],
+  ["#fff", "#ff2fd6", "#7dff8a"],
+];
 
-const caseNumber =
-Math.floor(Math.random() * 90000) + 10000;
+/* ---------- canvas fx ---------- */
 
-const transmission =
+const canvas = document.getElementById("fx-canvas");
+const ctx = canvas.getContext("2d");
 
-`${randomItem(openings)}:
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
 
-${randomItem(actions)}
+let particles = [];
+let fxRunning = true;
 
-${randomItem(endings)}`;
+function spawnConfetti(colors, count = 140){
+  for (let i = 0; i < count; i++){
+    particles.push({
+      type: "confetti",
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * canvas.height * 0.5,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 4,
+      size: 4 + Math.random() * 8,
+      color: randomItem(colors),
+      rot: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 12,
+    });
+  }
+}
 
-document.getElementById("case").textContent =
-CASE #${caseNumber};
+function spawnSparks(colors, count = 90){
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  for (let i = 0; i < count; i++){
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 9;
+    particles.push({
+      type: "spark",
+      x: cx,
+      y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 60 + Math.random() * 40,
+      maxLife: 100,
+      color: randomItem(colors),
+      size: 1 + Math.random() * 3,
+    });
+  }
+}
 
-const messageElement =
-document.getElementById("message");
+function spawnBlobs(colors, count = 7){
+  for (let i = 0; i < count; i++){
+    particles.push({
+      type: "blob",
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      size: 80 + Math.random() * 180,
+      color: randomItem(colors),
+      opacity: 0.18 + Math.random() * 0.12,
+    });
+  }
+}
 
-messageElement.style.color = color;
+let lightningTimer = 0;
+function maybeLightning(colors){
+  lightningTimer--;
+  if (lightningTimer <= 0 && Math.random() < 0.015){
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = randomItem(colors);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    lightningTimer = 30;
+  }
+}
 
-typeWriter(transmission);
+function tick(mode, colors){
+  if (!fxRunning) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function typeWriter(text) {
+  if (mode === "lightning") maybeLightning(colors);
 
-let i = 0;
-
-const speed = 28;
-
-const timer = setInterval(() => {
-
-    messageElement.textContent += text.charAt(i);
-
-    i++;
-
-    if (i >= text.length) {
-        clearInterval(timer);
+  particles.forEach(p => {
+    if (p.type === "confetti"){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.03;
+      p.rot += p.vr;
+      if (p.y > canvas.height + 30) p.y = -20;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      ctx.restore();
     }
+    if (p.type === "spark"){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life--;
+      ctx.save();
+      ctx.globalAlpha = Math.max(p.life / p.maxLife, 0);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    if (p.type === "blob"){
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -p.size) p.x = canvas.width + p.size;
+      if (p.x > canvas.width + p.size) p.x = -p.size;
+      if (p.y < -p.size) p.y = canvas.height + p.size;
+      if (p.y > canvas.height + p.size) p.y = -p.size;
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.filter = "blur(40px)";
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  });
 
-}, speed);
+  particles = particles.filter(p => !(p.type === "spark" && p.life <= 0));
 
+  requestAnimationFrame(() => tick(mode, colors));
 }
 
-createOrbs(color);
+/* ---------- typewriter ---------- */
 
-function createOrbs(color) {
-
-for (let i = 0; i < 8; i++) {
-
-    const orb = document.createElement("div");
-
-    orb.className = "orb";
-
-    const size =
-        Math.random() * 250 + 120;
-
-    orb.style.width = size + "px";
-    orb.style.height = size + "px";
-
-    orb.style.background = color;
-
-    orb.style.left =
-        Math.random() * 100 + "vw";
-
-    orb.style.top =
-        Math.random() * 100 + "vh";
-
-    document.body.appendChild(orb);
-
-    orb.animate(
-        [
-            {
-                transform:
-                    `translate(0px,0px)`
-            },
-            {
-                transform:
-                    `translate(${Math.random() * 120 - 60}px,-120px)`
-            },
-            {
-                transform:
-                    `translate(0px,0px)`
-            }
-        ],
-        {
-            duration:
-                10000 + Math.random() * 6000,
-            iterations: Infinity
-        }
-    );
+function typeWriter(el, text, speed = 22){
+  el.textContent = "";
+  let i = 0;
+  const timer = setInterval(() => {
+    el.textContent += text.charAt(i);
+    i++;
+    if (i >= text.length) clearInterval(timer);
+  }, speed);
 }
 
+/* ---------- modes ---------- */
+
+const modeNames = ["confetti", "sparks", "blobs", "lightning", "glitch", "vinyl"];
+
+function applyVisualMode(mode, colors, messageEl){
+  document.body.style.setProperty("--accent", colors[0]);
+  particles = [];
+
+  switch (mode){
+    case "confetti":
+      spawnConfetti(colors);
+      messageEl.classList.add("pop-in");
+      break;
+    case "sparks":
+      spawnSparks(colors);
+      messageEl.classList.add("pop-in");
+      break;
+    case "blobs":
+      spawnBlobs(colors);
+      messageEl.classList.add("flicker");
+      break;
+    case "lightning":
+      spawnBlobs(colors, 3);
+      messageEl.classList.add("shake");
+      break;
+    case "glitch":
+      spawnBlobs(colors, 4);
+      messageEl.classList.add("glitch-wrap");
+      messageEl.setAttribute("data-text", messageEl.textContent);
+      break;
+    case "vinyl":
+      spawnBlobs(colors, 5);
+      messageEl.classList.add("spin");
+      break;
+  }
+
+  tick(mode, colors);
 }
+
+function run(){
+  particles = [];
+  fxRunning = true;
+
+  const colors = randomItem(palettes);
+  const mode = randomItem(modeNames);
+  const text = buildMessage();
+
+  const caseNumber = Math.floor(Math.random() * 90000) + 10000;
+  document.getElementById("case").textContent = `CASE #${caseNumber} — MODE: ${mode.toUpperCase()}`;
+
+  const messageEl = document.getElementById("message");
+  messageEl.className = "";
+  messageEl.removeAttribute("data-text");
+  messageEl.style.color = colors[0];
+
+  document.getElementById("sign").textContent = randomItem(signatures);
+
+  typeWriter(messageEl, text);
+
+  setTimeout(() => {
+    if (mode === "glitch") messageEl.setAttribute("data-text", text);
+    applyVisualMode(mode, colors, messageEl);
+  }, text.length * 22 + 80);
+}
+
+document.getElementById("again").addEventListener("click", run);
+
+run();

@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Department of Adventure</title>
+        <title>TRANSMISSION INCOMING</title>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div id="background"></div>
-        <div id="terminal">
-            <div id="agency">
-                DEPARTMENT OF ADVENTURE
+        <canvas id="fx-canvas"></canvas>
+
+        <main id="stage">
+            <div id="tape">★ HANDLE WITH CHAOS ★ DO NOT IGNORE ★ CLASSIFIED VIBES ★</div>
+
+            <div id="terminal">
+                <div id="agency">TRANSMISSION HQ</div>
+                <div id="case"></div>
+                <h1 id="message"></h1>
+                <div id="sign"></div>
             </div>
-            <div id="case"></div>
-            <div id="message"></div>
-        </div>
+
+            <button id="again">TRANSMIT AGAIN ↺</button>
+        </main>
+
         <script src="script.js"></script>
     </body>
 </html>
