@@ -127,14 +127,14 @@ const portals = [
   },
 ];
 
-/* bold flat colour duos — card fill + a contrasting line/shadow colour,
+/* bold flat colour blocks — card fill, always outlined in ink,
    picked fresh every run, Oatly-style colour blocking */
 const accentDuos = [
-  { fill: "#ffe14d", line: "#ff5b3d" },
-  { fill: "#ff5b3d", line: "#ffe14d" },
-  { fill: "#3df2a4", line: "#ff4fae" },
-  { fill: "#5ad1ff", line: "#ff5b3d" },
-  { fill: "#ff4fae", line: "#3df2a4" },
+  { fill: "#ffcd29", line: "#1a1a1a" },
+  { fill: "#ff7a59", line: "#1a1a1a" },
+  { fill: "#7ed99a", line: "#1a1a1a" },
+  { fill: "#6fb8ff", line: "#1a1a1a" },
+  { fill: "#ff8fc6", line: "#1a1a1a" },
 ];
 
 /* ---------- canvas fx: a single one-shot burst, fired only on "explode" ---------- */
@@ -174,6 +174,18 @@ function spawnBurst(color, count = 22){
   }
 }
 
+function drawParticle(p){
+  ctx.save();
+  ctx.globalAlpha = Math.max(p.life / p.maxLife, 0);
+  ctx.translate(p.x, p.y);
+  ctx.rotate((p.rot * Math.PI) / 180);
+  ctx.fillStyle = p.color;
+  ctx.beginPath();
+  ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function tick(token){
   if (token !== fxToken || !canvas) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -183,13 +195,7 @@ function tick(token){
     p.y += p.vy;
     p.rot += p.vr;
     p.life--;
-    ctx.save();
-    ctx.globalAlpha = Math.max(p.life / p.maxLife, 0);
-    ctx.translate(p.x, p.y);
-    ctx.rotate((p.rot * Math.PI) / 180);
-    ctx.fillStyle = p.color;
-    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-    ctx.restore();
+    drawParticle(p);
   });
 
   particles = particles.filter(p => p.life > 0);
@@ -254,7 +260,7 @@ function applyCardAnimation(mode, duo, card){
     case "explode":
       card.classList.add("card-explode");
       card.classList.add("pulse-glow");
-      spawnBurst(duo.line);
+      spawnBurst(duo.fill);
       fxToken++;
       tick(fxToken);
       break;
