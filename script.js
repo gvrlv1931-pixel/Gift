@@ -74,6 +74,34 @@ function buildMessage(){
   return tag ? `${line} ${tag}` : line;
 }
 
+const portals = [
+  {
+    tagline: "Lost? Somewhere, a finger is already pointing exactly at you.",
+    label: "FIND THE POINTER →",
+    url: "https://pointerpointer.com",
+  },
+  {
+    tagline: "Stressful day? The void's got room for one more scream.",
+    label: "SCREAM INTO THE VOID →",
+    url: "https://screamintothevoid.com",
+  },
+  {
+    tagline: "Nothing's fine. Click this. Pretend it is.",
+    label: "MAKE IT OK →",
+    url: "https://make-everything.ok.com",
+  },
+  {
+    tagline: "Bored out your mind? Scroll the longest dog known to man.",
+    label: "SCROLL THE LONG DOGE →",
+    url: "https://longdogechallenge.com",
+  },
+  {
+    tagline: "Feeling broke? Go blow Bill Gates' fortune instead. He won't notice.",
+    label: "SPEND HIS MONEY →",
+    url: "https://neal.fun/spend/",
+  },
+];
+
 const palettes = [
   ["#ff2fd6", "#2fe1ff", "#ffe45e"],
   ["#ff5e3a", "#ffe45e", "#7dff8a"],
@@ -235,6 +263,7 @@ const modeNames = ["confetti", "sparks", "blobs", "lightning", "glitch", "stamp"
 
 function applyVisualMode(mode, colors, messageEl){
   document.body.style.setProperty("--accent", colors[0]);
+  document.body.style.setProperty("--accent2", colors[1] || colors[0]);
   particles = [];
 
   switch (mode){
@@ -274,18 +303,32 @@ function run(){
 
   const colors = randomItem(palettes);
   const mode = randomItem(modeNames);
-  const text = buildMessage();
+  const isPortal = Math.random() < 0.38;
+  const portal = isPortal ? randomItem(portals) : null;
+  const text = portal ? portal.tagline : buildMessage();
 
   const messageEl = document.getElementById("message");
+  const portalBtn = document.getElementById("portal-btn");
+
   messageEl.className = "";
   messageEl.removeAttribute("data-text");
   messageEl.style.color = colors[0];
+
+  portalBtn.classList.remove("show", "btn-pop");
+  portalBtn.style.removeProperty("--accent");
 
   typeWriter(messageEl, text);
 
   setTimeout(() => {
     if (mode === "glitch") messageEl.setAttribute("data-text", text);
     applyVisualMode(mode, colors, messageEl);
+
+    if (portal){
+      portalBtn.textContent = portal.label;
+      portalBtn.href = portal.url;
+      portalBtn.style.setProperty("--accent", colors[2] || colors[1] || colors[0]);
+      portalBtn.classList.add("show", "btn-pop");
+    }
   }, text.length * 24 + 80);
 }
 

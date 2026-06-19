@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:wght@400;700&display=swap');
 
 *{ box-sizing:border-box; }
 
@@ -8,19 +8,54 @@ html, body{
 }
 
 body{
-    background:#0b0b0c;
+    background:#070708;
     background-image:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.03), transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,.025), transparent 45%),
-        repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 2px, transparent 2px 4px);
+        radial-gradient(circle at 15% 15%, rgba(255,46,214,.08), transparent 38%),
+        radial-gradient(circle at 85% 25%, rgba(47,225,255,.07), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(125,255,138,.05), transparent 45%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px),
+        linear-gradient(180deg, #050506, #0c0c10 60%, #050506);
     color:#fff;
-    font-family:'Archivo Black', sans-serif;
+    font-family:'Space Mono', monospace;
     min-height:100vh;
     min-height:100dvh;
     overflow:hidden;
     display:flex;
     justify-content:center;
     align-items:center;
+    position:relative;
+}
+
+/* cyberpunk grid floor */
+body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background-image:
+        linear-gradient(rgba(255,46,214,.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47,225,255,.1) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:radial-gradient(circle at 50% 50%, rgba(0,0,0,.9), transparent 75%);
+    opacity:.5;
+}
+
+/* scanlines */
+body::after{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+    background:repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,.18) 0px,
+        rgba(0,0,0,.18) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    opacity:.35;
+    mix-blend-mode:multiply;
 }
 
 #fx-canvas{
@@ -40,20 +75,79 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    padding:8vw 7vw;
+    padding:7vw 6vw;
+}
+
+#card{
+    position:relative;
+    width:100%;
+    max-width:480px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+    padding:34px 22px;
+    background:rgba(10,10,12,.55);
+    border:2px solid rgba(255,255,255,.12);
+    border-radius:6px;
+    clip-path:polygon(0% 4%, 3% 0%, 97% 0%, 100% 3%, 100% 96%, 97% 100%, 3% 100%, 0% 97%);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,.04) inset,
+        0 18px 60px rgba(0,0,0,.55);
+    backdrop-filter:blur(3px);
+}
+
+#card::before{
+    content:'';
+    position:absolute;
+    inset:-2px;
+    z-index:-1;
+    border-radius:8px;
+    background:linear-gradient(135deg, var(--accent, #ff2fd6), transparent 35%, transparent 65%, var(--accent2, #2fe1ff));
+    opacity:.55;
+    filter:blur(1px);
 }
 
 #message{
     margin:0;
     text-align:center;
-    font-size:clamp(1.6rem, 8vw, 3.1rem);
-    line-height:1.28;
-    max-width:22ch;
+    font-family:'Bungee', 'Space Mono', sans-serif;
+    font-size:clamp(1.35rem, 6.4vw, 2.3rem);
+    line-height:1.32;
+    max-width:23ch;
     letter-spacing:.5px;
     text-shadow:
-        0 0 18px var(--accent, #ff2fd6),
-        2px 2px 0 rgba(0,0,0,.85);
+        0 0 16px var(--accent, #ff2fd6),
+        3px 3px 0 rgba(0,0,0,.9);
     word-wrap:break-word;
+}
+
+#portal-btn{
+    display:none;
+    text-decoration:none;
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:clamp(.85rem, 3.6vw, 1.05rem);
+    letter-spacing:1.5px;
+    color:#0a0a0a;
+    background:var(--accent, #ffe45e);
+    padding:14px 22px;
+    border-radius:999px;
+    border:2px solid rgba(0,0,0,.6);
+    box-shadow:4px 4px 0 rgba(0,0,0,.7);
+    transform:rotate(-1deg);
+    transition:transform .15s ease, box-shadow .15s ease;
+    text-align:center;
+    min-width:min(85%, 320px);
+}
+
+#portal-btn:active{
+    transform:translate(2px,2px) rotate(0deg);
+    box-shadow:1px 1px 0 rgba(0,0,0,.7);
+}
+
+#portal-btn.show{
+    display:inline-block;
 }
 
 @keyframes shake{
@@ -136,4 +230,14 @@ body{
 
 .stamp{
     animation:stamp .5s ease-out both;
+}
+
+@keyframes btnPop{
+    0%{ transform:scale(0) rotate(-12deg); opacity:0; }
+    65%{ transform:scale(1.1) rotate(2deg); opacity:1; }
+    100%{ transform:scale(1) rotate(-1deg); opacity:1; }
+}
+
+.btn-pop{
+    animation:btnPop .45s cubic-bezier(.34,1.56,.64,1) both;
 }
