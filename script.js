@@ -65,7 +65,6 @@ const lines = [
   "You looked good today. Annoyingly good, actually.",
   "Your hair just outperformed your last three decisions combined.",
   "Your hair is doing more strategic planning than you are.",
-  "Somewhere, a mirror is getting a real workout.",
   "You talk a big game, but you also just... follow through. Weird flex, but okay.",
 
   // pool
