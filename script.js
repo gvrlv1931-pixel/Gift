@@ -225,7 +225,7 @@ function typeWriter(el, text, runId, speed = 22){
 
 /* ---------- card entrance modes ---------- */
 
-const cardModes = ["drop", "shake", "explode", "fly", "fade"];
+const cardModes = ["drop", "shake", "explode", "fly", "fade", "glitch"];
 const flyOrigins = [
   { x: "-130vw", y: "-40vh", r: "-50deg" },
   { x: "130vw", y: "-30vh", r: "55deg" },
@@ -239,7 +239,7 @@ function applyCardAnimation(mode, duo, card){
   document.body.style.setProperty("--line", duo.line);
   particles = [];
 
-  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "pulse-glow");
+  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "card-glitch", "pulse-glow");
   card.style.removeProperty("--fly-x");
   card.style.removeProperty("--fly-y");
   card.style.removeProperty("--fly-r");
@@ -266,6 +266,9 @@ function applyCardAnimation(mode, duo, card){
       card.classList.add("card-fly");
       break;
     }
+    case "glitch":
+      card.classList.add("card-glitch");
+      break;
     case "fade":
       card.classList.add("card-fade");
       break;
@@ -298,12 +301,6 @@ function run(){
   const portalBtn = document.getElementById("portal-btn");
   const card = document.getElementById("card");
   if (!card) return;
-
-  const tagEl = document.getElementById("card-tag");
-  if (tagEl){
-    const id = Math.floor(Math.random() * 0xfff).toString(16).toUpperCase().padStart(3, "0");
-    tagEl.textContent = `TX_${id}`;
-  }
 
   messageEl.textContent = "";
 
