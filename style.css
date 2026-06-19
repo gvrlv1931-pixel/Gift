@@ -37,25 +37,24 @@ body::before{
         linear-gradient(90deg, rgba(47,225,255,.1) 1px, transparent 1px);
     background-size:42px 42px;
     mask-image:radial-gradient(circle at 50% 50%, rgba(0,0,0,.9), transparent 75%);
-    opacity:.5;
+    opacity:.45;
 }
 
-/* scanlines */
+/* scanlines — kept behind the card so they never sit on top of the text */
 body::after{
     content:'';
     position:fixed;
     inset:0;
-    z-index:3;
+    z-index:1;
     pointer-events:none;
     background:repeating-linear-gradient(
         0deg,
-        rgba(0,0,0,.18) 0px,
-        rgba(0,0,0,.18) 1px,
+        rgba(0,0,0,.15) 0px,
+        rgba(0,0,0,.15) 1px,
         transparent 1px,
         transparent 3px
     );
-    opacity:.35;
-    mix-blend-mode:multiply;
+    opacity:.18;
 }
 
 #fx-canvas{
@@ -86,39 +85,41 @@ body::after{
     flex-direction:column;
     align-items:center;
     gap:22px;
-    padding:34px 22px;
-    background:rgba(10,10,12,.55);
-    border:2px solid rgba(255,255,255,.12);
-    border-radius:6px;
-    clip-path:polygon(0% 4%, 3% 0%, 97% 0%, 100% 3%, 100% 96%, 97% 100%, 3% 100%, 0% 97%);
+    padding:36px 24px;
+    background:#101012;
+    border:3px solid rgba(255,255,255,.85);
+    border-radius:4px;
+    clip-path:polygon(0% 3%, 2% 0%, 98% 0%, 100% 2%, 100% 97%, 98% 100%, 2% 100%, 0% 98%);
     box-shadow:
-        0 0 0 1px rgba(255,255,255,.04) inset,
-        0 18px 60px rgba(0,0,0,.55);
-    backdrop-filter:blur(3px);
+        0 0 0 6px rgba(0,0,0,.6),
+        0 18px 50px rgba(0,0,0,.6);
+    transform:rotate(-1deg);
 }
 
 #card::before{
     content:'';
     position:absolute;
-    inset:-2px;
+    inset:-9px;
     z-index:-1;
-    border-radius:8px;
-    background:linear-gradient(135deg, var(--accent, #ff2fd6), transparent 35%, transparent 65%, var(--accent2, #2fe1ff));
-    opacity:.55;
-    filter:blur(1px);
+    border-radius:6px;
+    background:linear-gradient(135deg, var(--accent, #ff2fd6), var(--accent2, #2fe1ff));
+    opacity:.9;
 }
 
 #message{
     margin:0;
     text-align:center;
-    font-family:'Bungee', 'Space Mono', sans-serif;
-    font-size:clamp(1.35rem, 6.4vw, 2.3rem);
-    line-height:1.32;
+    font-family:'Permanent Marker', 'Bungee', sans-serif;
+    font-weight:700;
+    font-size:clamp(1.5rem, 6.8vw, 2.5rem);
+    line-height:1.3;
     max-width:23ch;
     letter-spacing:.5px;
+    color:#fdfdfd;
+    -webkit-text-stroke:1.5px rgba(0,0,0,.9);
     text-shadow:
-        0 0 16px var(--accent, #ff2fd6),
-        3px 3px 0 rgba(0,0,0,.9);
+        0 0 14px var(--accent, #ff2fd6),
+        0 0 26px var(--accent, #ff2fd6);
     word-wrap:break-word;
 }
 
@@ -127,15 +128,15 @@ body::after{
     text-decoration:none;
     font-family:'Space Mono', monospace;
     font-weight:700;
-    font-size:clamp(.85rem, 3.6vw, 1.05rem);
-    letter-spacing:1.5px;
+    font-size:clamp(.8rem, 3.6vw, 1rem);
+    letter-spacing:1px;
     color:#0a0a0a;
     background:var(--accent, #ffe45e);
-    padding:14px 22px;
+    padding:14px 20px;
     border-radius:999px;
-    border:2px solid rgba(0,0,0,.6);
+    border:2px solid rgba(0,0,0,.7);
     box-shadow:4px 4px 0 rgba(0,0,0,.7);
-    transform:rotate(-1deg);
+    transform:rotate(1deg);
     transition:transform .15s ease, box-shadow .15s ease;
     text-align:center;
     min-width:min(85%, 320px);
@@ -174,42 +175,17 @@ body::after{
     animation:flicker 3.4s infinite;
 }
 
-@keyframes glitchTop{
-    0%,100%{ clip-path:inset(0 0 92% 0); transform:translate(0,0); }
-    10%{ clip-path:inset(15% 0 65% 0); transform:translate(-2px,1px); }
-    20%{ clip-path:inset(45% 0 30% 0); transform:translate(2px,-1px); }
-    30%{ clip-path:inset(0 0 92% 0); transform:translate(0,0); }
-}
-
-@keyframes glitchBottom{
-    0%,100%{ clip-path:inset(92% 0 0 0); transform:translate(0,0); }
-    15%{ clip-path:inset(65% 0 15% 0); transform:translate(1px,-1px); }
-    25%{ clip-path:inset(30% 0 45% 0); transform:translate(-1px,1px); }
-    35%{ clip-path:inset(92% 0 0 0); transform:translate(0,0); }
+/* a brief, single-layer flicker — never duplicates the text, so it stays readable */
+@keyframes glitchPulse{
+    0%, 92%, 100%{ transform:translate(0,0) skewX(0deg); filter:none; }
+    93%{ transform:translate(-3px,1px) skewX(-3deg); filter:hue-rotate(40deg); }
+    95%{ transform:translate(3px,-1px) skewX(3deg); filter:hue-rotate(-30deg); }
+    97%{ transform:translate(-1px,0) skewX(0deg); filter:none; }
 }
 
 .glitch-wrap{
-    position:relative;
     display:block;
-}
-
-.glitch-wrap::before,
-.glitch-wrap::after{
-    content:attr(data-text);
-    position:absolute;
-    left:0; top:0;
-    width:100%;
-    opacity:.85;
-}
-
-.glitch-wrap::before{
-    color:#ff2fd6;
-    animation:glitchTop 3s infinite linear;
-}
-
-.glitch-wrap::after{
-    color:#2fe1ff;
-    animation:glitchBottom 3s infinite linear;
+    animation:glitchPulse 3.2s infinite;
 }
 
 @keyframes popIn{
