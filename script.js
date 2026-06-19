@@ -90,20 +90,23 @@ const portals = [
   },
 ];
 
-const palettes = [
-  ["#ff2fd6", "#2fe1ff", "#ffe45e"],
-  ["#ff5e3a", "#ffe45e", "#7dff8a"],
-  ["#7dff8a", "#2fe1ff", "#ff2fd6"],
-  ["#ffe45e", "#ff5e3a", "#2fe1ff"],
-  ["#b967ff", "#2fe1ff", "#ff2fd6"],
+/* one bright accent colour at a time — picked fresh every run */
+const accents = [
+  "#2fe1ff",
+  "#ff2fd6",
+  "#ffe45e",
+  "#7dff8a",
+  "#ff5e3a",
+  "#b967ff",
 ];
 
-/* ---------- canvas fx ---------- */
+/* ---------- canvas fx (flat geometric shapes, single accent colour) ---------- */
 
 const canvas = document.getElementById("fx-canvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas ? canvas.getContext("2d") : null;
 
 function resize(){
+  if (!canvas) return;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
@@ -111,177 +114,179 @@ resize();
 window.addEventListener("resize", resize);
 
 let particles = [];
+let fxRunning = false;
+let fxToken = 0;
 
-function spawnConfetti(colors, count = 90){
+function spawnSquares(color, count = 26){
   for (let i = 0; i < count; i++){
     particles.push({
-      type: "confetti",
+      type: "square",
       x: Math.random() * canvas.width,
-      y: -20 - Math.random() * canvas.height * 0.5,
-      vx: (Math.random() - 0.5) * 3,
-      vy: 2 + Math.random() * 4,
-      size: 4 + Math.random() * 8,
-      color: randomItem(colors),
+      y: -20 - Math.random() * canvas.height * 0.6,
+      vy: 1.4 + Math.random() * 2.6,
+      size: 6 + Math.random() * 10,
       rot: Math.random() * 360,
-      vr: (Math.random() - 0.5) * 12,
+      vr: (Math.random() - 0.5) * 6,
+      color,
     });
   }
 }
 
-function spawnSparks(colors, count = 70){
+function spawnDots(color, count = 40){
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
   for (let i = 0; i < count; i++){
     const angle = Math.random() * Math.PI * 2;
-    const speed = 2 + Math.random() * 8;
+    const speed = 2 + Math.random() * 6;
     particles.push({
-      type: "spark",
+      type: "dot",
       x: cx,
       y: cy,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      life: 60 + Math.random() * 40,
-      maxLife: 100,
-      color: randomItem(colors),
-      size: 1 + Math.random() * 3,
+      life: 50 + Math.random() * 30,
+      maxLife: 80,
+      size: 2 + Math.random() * 2,
+      color,
     });
   }
 }
 
-function spawnBlobs(colors, count = 5){
+function spawnLines(color, count = 5){
   for (let i = 0; i < count; i++){
     particles.push({
-      type: "blob",
+      type: "line",
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      size: 70 + Math.random() * 140,
-      color: randomItem(colors),
-      opacity: 0.08 + Math.random() * 0.07,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      len: 30 + Math.random() * 60,
+      angle: Math.random() * Math.PI,
+      opacity: 0.12 + Math.random() * 0.1,
+      color,
     });
   }
 }
 
-let lightningTimer = 0;
-function maybeLightning(colors){
-  lightningTimer--;
-  if (lightningTimer <= 0 && Math.random() < 0.012){
-    ctx.save();
-    ctx.globalAlpha = 0.28;
-    ctx.fillStyle = randomItem(colors);
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-    lightningTimer = 30;
-  }
+let scanY = -1;
+function drawScan(color){
+  if (scanY < 0) return;
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, scanY, canvas.width, 2);
+  ctx.restore();
+  scanY += 9;
+  if (scanY > canvas.height) scanY = -1;
 }
 
-let fxRunning = true;
-
-function tick(mode, colors){
-  if (!fxRunning) return;
+function tick(mode, color, token){
+  if (!fxRunning || token !== fxToken || !canvas) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (mode === "lightning") maybeLightning(colors);
+  if (mode === "scan") drawScan(color);
 
   particles.forEach(p => {
-    if (p.type === "confetti"){
-      p.x += p.vx;
+    if (p.type === "square"){
       p.y += p.vy;
-      p.vy += 0.03;
       p.rot += p.vr;
-      if (p.y > canvas.height + 30) p.y = -20;
+      if (p.y > canvas.height + 20) p.y = -20;
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate((p.rot * Math.PI) / 180);
       ctx.fillStyle = p.color;
-      ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
       ctx.restore();
     }
-    if (p.type === "spark"){
+    if (p.type === "dot"){
       p.x += p.vx;
       p.y += p.vy;
       p.life--;
       ctx.save();
       ctx.globalAlpha = Math.max(p.life / p.maxLife, 0);
       ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
       ctx.restore();
     }
-    if (p.type === "blob"){
+    if (p.type === "line"){
       p.x += p.vx;
       p.y += p.vy;
-      if (p.x < -p.size) p.x = canvas.width + p.size;
-      if (p.x > canvas.width + p.size) p.x = -p.size;
-      if (p.y < -p.size) p.y = canvas.height + p.size;
-      if (p.y > canvas.height + p.size) p.y = -p.size;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
       ctx.save();
       ctx.globalAlpha = p.opacity;
-      ctx.filter = "blur(40px)";
-      ctx.fillStyle = p.color;
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + Math.cos(p.angle) * p.len, p.y + Math.sin(p.angle) * p.len);
+      ctx.stroke();
       ctx.restore();
     }
   });
 
-  particles = particles.filter(p => !(p.type === "spark" && p.life <= 0));
+  particles = particles.filter(p => !(p.type === "dot" && p.life <= 0));
 
-  requestAnimationFrame(() => tick(mode, colors));
+  requestAnimationFrame(() => tick(mode, color, token));
 }
 
 /* ---------- typewriter ---------- */
 
-function typeWriter(el, text, speed = 24){
+let typeTimer = null;
+
+function typeWriter(el, text, speed = 22){
+  if (typeTimer) clearInterval(typeTimer);
   el.textContent = "";
   let i = 0;
-  const timer = setInterval(() => {
+  typeTimer = setInterval(() => {
     el.textContent += text.charAt(i);
     i++;
-    if (i >= text.length) clearInterval(timer);
+    if (i >= text.length){
+      clearInterval(typeTimer);
+      typeTimer = null;
+    }
   }, speed);
 }
 
 /* ---------- modes ---------- */
 
-const modeNames = ["confetti", "sparks", "blobs", "lightning", "glitch", "stamp"];
+const modeNames = ["pop", "slide", "stamp", "scan", "squares", "dots"];
 
-function applyVisualMode(mode, colors, messageEl){
-  document.body.style.setProperty("--accent", colors[0]);
-  document.body.style.setProperty("--accent2", colors[1] || colors[0]);
+function applyVisualMode(mode, color, messageEl, token){
+  document.body.style.setProperty("--accent", color);
   particles = [];
+  scanY = -1;
 
   switch (mode){
-    case "confetti":
-      spawnConfetti(colors);
+    case "pop":
       messageEl.classList.add("pop-in");
+      spawnLines(color, 3);
       break;
-    case "sparks":
-      spawnSparks(colors);
-      messageEl.classList.add("pop-in");
-      break;
-    case "blobs":
-      spawnBlobs(colors);
-      messageEl.classList.add("flicker");
-      break;
-    case "lightning":
-      spawnBlobs(colors, 3);
-      messageEl.classList.add("shake");
-      break;
-    case "glitch":
-      spawnBlobs(colors, 4);
-      messageEl.classList.add("glitch-wrap");
+    case "slide":
+      messageEl.classList.add("slide-up");
+      spawnLines(color, 4);
       break;
     case "stamp":
-      spawnBlobs(colors, 5);
       messageEl.classList.add("stamp");
+      document.getElementById("card")?.classList.add("pulse-glow");
+      break;
+    case "scan":
+      messageEl.classList.add("pop-in");
+      scanY = 0;
+      break;
+    case "squares":
+      messageEl.classList.add("pop-in");
+      spawnSquares(color);
+      break;
+    case "dots":
+      messageEl.classList.add("pop-in");
+      spawnDots(color);
       break;
   }
 
-  tick(mode, colors);
+  tick(mode, color, token);
 }
 
 function run(){
@@ -290,41 +295,63 @@ function run(){
 
   particles = [];
   fxRunning = true;
+  fxToken++;
+  const token = fxToken;
 
-  const colors = randomItem(palettes);
+  const color = randomItem(accents);
   const mode = randomItem(modeNames);
-  const isPortal = Math.random() < 0.38;
+  const isPortal = Math.random() < 0.32;
   const portal = isPortal ? randomItem(portals) : null;
   const text = portal ? portal.tagline : buildMessage();
 
   const portalBtn = document.getElementById("portal-btn");
+  const card = document.getElementById("card");
 
   messageEl.className = "";
-  messageEl.style.color = "";
+  card?.classList.remove("pulse-glow");
 
   if (portalBtn){
     portalBtn.classList.remove("show", "btn-pop");
-    portalBtn.style.removeProperty("--accent");
   }
 
   typeWriter(messageEl, text);
 
   setTimeout(() => {
-    applyVisualMode(mode, colors, messageEl);
+    applyVisualMode(mode, color, messageEl, token);
 
     if (portal && portalBtn){
       portalBtn.textContent = portal.label;
       portalBtn.href = portal.url;
-      portalBtn.style.setProperty("--accent", colors[2] || colors[1] || colors[0]);
       portalBtn.classList.add("show", "btn-pop");
     }
-  }, text.length * 24 + 80);
+  }, text.length * 22 + 80);
 }
 
-try {
-  run();
-} catch (err) {
-  const fallback = document.getElementById("message");
-  if (fallback) fallback.textContent = buildMessage();
-  console.error(err);
+function safeRun(){
+  try {
+    run();
+  } catch (err) {
+    const fallback = document.getElementById("message");
+    if (fallback) fallback.textContent = buildMessage();
+    console.error(err);
+  }
 }
+
+safeRun();
+
+/* Phones often resume an already-open tab on NFC tap instead of doing a
+   fresh navigation, and some browsers restore the page from the
+   back/forward cache without re-running scripts. Re-roll whenever the
+   page becomes visible again so every tap feels like a new transmission. */
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) safeRun();
+});
+
+let lastHiddenAt = 0;
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden"){
+    lastHiddenAt = Date.now();
+  } else if (document.visibilityState === "visible" && lastHiddenAt){
+    safeRun();
+  }
+});
