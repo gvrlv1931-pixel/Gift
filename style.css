@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Special+Elite&family=Permanent+Marker&display=swap');
 
 *{ box-sizing:border-box; }
 
@@ -8,13 +8,13 @@ html, body{
 }
 
 body{
-    --accent:#ffcd29;
-    --line:#1a1a1a;
-    --ink:#1a1a1a;
-    --paper:#f5efe3;
+    --accent:#c8102e;
+    --line:#e8e3d3;
+    --ink:#e8e3d3;
+    --paper:#0c0c0c;
     background:var(--paper);
     color:var(--ink);
-    font-family:'DM Sans', sans-serif;
+    font-family:'Special Elite', monospace;
     min-height:100vh;
     min-height:100dvh;
     overflow:hidden;
@@ -22,6 +22,22 @@ body{
     justify-content:center;
     align-items:center;
     position:relative;
+}
+
+/* concrete / grime texture across the whole page */
+body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.05) 0, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,.04) 0, transparent 45%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px 3px);
+    mix-blend-mode:overlay;
+    opacity:.5;
 }
 
 #fx-canvas{
@@ -44,7 +60,7 @@ body{
     padding:7vw 6vw;
 }
 
-/* loose hand-drawn dots scattered behind the card, Oatly sticker-sheet style */
+/* spray-can splatter scattered behind the card, underground graffiti tag style */
 #stage::before{
     content:'';
     position:absolute;
@@ -52,17 +68,22 @@ body{
     z-index:0;
     pointer-events:none;
     background-image:
-        radial-gradient(circle, var(--ink) 0 4px, transparent 5px),
-        radial-gradient(circle, var(--ink) 0 3px, transparent 4px),
-        radial-gradient(circle, var(--ink) 0 3px, transparent 4px),
-        radial-gradient(circle, var(--ink) 0 4px, transparent 5px);
+        radial-gradient(circle, var(--accent) 0 3px, transparent 4px),
+        radial-gradient(circle, var(--accent) 0 2px, transparent 3px),
+        radial-gradient(circle, var(--accent) 0 5px, transparent 6px),
+        radial-gradient(circle, var(--accent) 0 2px, transparent 3px),
+        radial-gradient(circle, var(--ink) 0 2px, transparent 3px),
+        radial-gradient(circle, var(--ink) 0 3px, transparent 4px);
     background-position:
-        10% 16%,
-        88% 12%,
-        14% 86%,
-        90% 82%;
+        12% 18%,
+        16% 22%,
+        86% 14%,
+        82% 19%,
+        15% 84%,
+        88% 80%;
     background-repeat:no-repeat;
-    opacity:.16;
+    opacity:.5;
+    filter:blur(.3px);
 }
 
 #card{
@@ -73,58 +94,81 @@ body{
     flex-direction:column;
     align-items:center;
     gap:22px;
-    padding:56px 32px 46px;
-    background:var(--accent);
-    border:5px solid var(--ink);
-    border-radius:34px;
-    box-shadow:10px 10px 0 var(--ink);
+    padding:58px 32px 48px;
+    background:
+        linear-gradient(155deg, rgba(255,255,255,.04), transparent 40%),
+        repeating-linear-gradient(-35deg, rgba(0,0,0,.18) 0 2px, transparent 2px 7px),
+        #161412;
+    border:3px solid var(--accent);
+    outline:1px solid rgba(232,227,211,.25);
+    outline-offset:-8px;
+    border-radius:6px;
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,.6),
+        0 25px 60px -10px rgba(0,0,0,.85),
+        inset 0 0 60px rgba(0,0,0,.55),
+        10px 10px 0 rgba(0,0,0,.7);
     will-change:transform, opacity;
+}
+
+/* torn-poster corner */
+#card::after{
+    content:'';
+    position:absolute;
+    top:0; right:0;
+    width:38px;
+    height:38px;
+    background:var(--paper);
+    clip-path:polygon(100% 0, 0 0, 100% 100%);
+    opacity:.85;
 }
 
 .badge{
     position:absolute;
-    top:-22px;
-    left:-22px;
-    width:56px;
-    height:56px;
+    top:-24px;
+    left:-24px;
+    width:58px;
+    height:58px;
     border-radius:50%;
     background:var(--paper);
-    border:5px solid var(--ink);
+    border:3px solid var(--accent);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-family:'Baloo 2', sans-serif;
-    font-weight:800;
-    font-size:1.5rem;
-    color:var(--ink);
+    font-family:'Pirata One', serif;
+    font-weight:400;
+    font-size:1.8rem;
+    color:var(--accent);
     transform:rotate(-12deg);
+    text-shadow:0 0 10px var(--accent);
 }
 
 .squiggle{
-    width:74px;
-    height:14px;
-    background-image:radial-gradient(circle at 25% 50%, var(--ink) 0 5px, transparent 6px),
-                      radial-gradient(circle at 75% 50%, var(--ink) 0 5px, transparent 6px);
-    background-size:50% 100%;
-    background-repeat:repeat-x;
-    opacity:.85;
+    width:84px;
+    height:10px;
+    background-image:
+        linear-gradient(90deg, var(--ink) 0 100%);
+    clip-path:polygon(0% 40%, 15% 0%, 30% 60%, 45% 10%, 60% 80%, 75% 20%, 90% 70%, 100% 30%, 100% 60%, 90% 100%, 75% 50%, 60% 100%, 45% 40%, 30% 90%, 15% 30%, 0% 70%);
+    opacity:.7;
 }
 
 #message{
     margin:0;
     text-align:center;
-    font-family:'Baloo 2', sans-serif;
-    font-weight:700;
-    font-size:clamp(1.7rem, 7.6vw, 2.7rem);
-    line-height:1.12;
+    font-family:'Permanent Marker', cursive;
+    font-weight:400;
+    font-size:clamp(1.5rem, 6.8vw, 2.4rem);
+    line-height:1.18;
     max-width:23ch;
-    letter-spacing:.1px;
+    letter-spacing:.2px;
     color:var(--ink);
     word-wrap:break-word;
+    text-shadow:0 0 14px rgba(200,16,46,.35), 2px 2px 0 rgba(0,0,0,.6);
 }
 
 #message::after{
     content:'_';
+    color:var(--accent);
     animation:cursorBlink 1s step-end infinite;
 }
 
@@ -136,23 +180,25 @@ body{
 #portal-btn{
     display:none;
     text-decoration:none;
-    font-family:'DM Sans', sans-serif;
-    font-weight:700;
-    font-size:clamp(.82rem, 3.2vw, .98rem);
-    letter-spacing:.4px;
+    font-family:'Special Elite', monospace;
+    font-weight:400;
+    font-size:clamp(.78rem, 3vw, .92rem);
+    letter-spacing:1.2px;
     text-transform:uppercase;
     color:var(--paper);
-    background:var(--ink);
+    background:var(--accent);
     padding:16px 26px;
-    border:3px solid var(--ink);
-    border-radius:999px;
+    border:2px solid var(--ink);
+    border-radius:2px;
     text-align:center;
     min-width:min(85%, 300px);
+    box-shadow:5px 5px 0 rgba(0,0,0,.7);
     transition:transform .12s ease;
 }
 
 #portal-btn:active{
-    transform:scale(.96);
+    transform:scale(.96) translate(2px, 2px);
+    box-shadow:2px 2px 0 rgba(0,0,0,.7);
 }
 
 #portal-btn.show{
@@ -212,8 +258,8 @@ body{
 .card-fade{ animation:cardFade .5s ease-out both; }
 
 @keyframes pulseGlow{
-    0%,100%{ box-shadow:10px 10px 0 var(--ink); }
-    50%{ box-shadow:14px 14px 0 var(--ink); }
+    0%,100%{ box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 25px 60px -10px rgba(0,0,0,.85), inset 0 0 60px rgba(0,0,0,.55), 10px 10px 0 rgba(0,0,0,.7), 0 0 0px var(--accent); }
+    50%{ box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 25px 60px -10px rgba(0,0,0,.85), inset 0 0 60px rgba(0,0,0,.55), 14px 14px 0 rgba(0,0,0,.7), 0 0 38px var(--accent); }
 }
 #card.pulse-glow{
     animation:pulseGlow 1.4s ease-in-out 2;

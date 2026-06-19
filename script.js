@@ -127,14 +127,14 @@ const portals = [
   },
 ];
 
-/* bold flat colour blocks — card fill, always outlined in ink,
-   picked fresh every run, Oatly-style colour blocking */
+/* underground club colour signals — blood red, toxic green, bruise
+   purple, acid yellow — picked fresh every run against the bone ink */
 const accentDuos = [
-  { fill: "#ffcd29", line: "#1a1a1a" },
-  { fill: "#ff7a59", line: "#1a1a1a" },
-  { fill: "#7ed99a", line: "#1a1a1a" },
-  { fill: "#6fb8ff", line: "#1a1a1a" },
-  { fill: "#ff8fc6", line: "#1a1a1a" },
+  { fill: "#c8102e", line: "#e8e3d3" },
+  { fill: "#9aff3c", line: "#e8e3d3" },
+  { fill: "#8a2be2", line: "#e8e3d3" },
+  { fill: "#e8e3d3", line: "#c8102e" },
+  { fill: "#ff6b00", line: "#e8e3d3" },
 ];
 
 /* ---------- canvas fx: a single one-shot burst, fired only on "explode" ---------- */
