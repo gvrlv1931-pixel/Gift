@@ -54,24 +54,12 @@ const lines = [
   "Two cushions, one pocket, zero doubt. Pot it.",
 ];
 
-const tags = [
-  "No notes.",
-  "Mic drop.",
-  "Scene.",
-  "Final answer.",
-  "Receipts only.",
-  "End of.",
-  "",
-  "",
-  "",
-];
 
 function randomItem(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
 function buildMessage(){
-  const tag = randomItem(tags);
   const line = randomItem(lines);
-  return tag ? `${line} ${tag}` : line;
+  return tag ? `${line}` : line;
 }
 
 const palettes = [
