@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
+*{
+margin:0;
+padding:0;
+box-sizing;
+}
+
+body{
+background:#090909;
+color;
+font-family:'Space Grotesk',sans-serif;
+height:100vh;
+overflow;
+display;
+justify-content;
+align-items;
+}
+
+.card{
+width(90%,700px);
+padding:50px;
+position;
+z-index:10;
+}
+
+#stamp{
+font-size:.85rem;
+letter-spacing:4px;
+opacity:.6;
+margin-bottom:30px;
+text-transform;
+}
+
+#message{
+font-size(2rem,5vw,4rem);
+line-height:1.15;
+font-weight:700;
+}
+
+#footer{
+margin-top:40px;
+opacity:.35;
+letter-spacing:2px;
+text-transform;
+font-size:.8rem;
+}
+
+.glow{
+animation 2.5s ease-in-out infinite alternate;
+}
+
+.float{
+animation 4s ease-in-out infinite;
+}
+
+.shake{
+animation 0.5s ease;
+}
+
+.slide{
+animation 1s ease;
+}
+
+@keyframes glow{
+from{
+text-shadow:0 0 10px currentColor;
+}
+
+to{
+    text-shadow:0 0 35px currentColor;
+}
+
+}
+
+@keyframes float{
+0%,100%{
+transform(0px);
+}
+
+50%{
+    transform:translateY(-12px);
+}
+
+}
+
+@keyframes shake{
+20%{transform(-2deg);}
+40%{transform(2deg);}
+60%{transform(-1deg);}
+80%{transform(1deg);}
+}
+
+@keyframes slideIn{
+from{
+opacity:0;
+transform(40px);
+}
+
+to{
+    opacity:1;
+    transform:translateY(0);
+}
+
+}
+
+.particle{
+position;
+border-radius:50%;
+opacity:.25;
+pointer-events;
+}
