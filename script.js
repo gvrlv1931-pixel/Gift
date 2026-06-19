@@ -107,7 +107,7 @@ const palettes = [
   ["#ff5e3a", "#ffe45e", "#7dff8a"],
   ["#7dff8a", "#2fe1ff", "#ff2fd6"],
   ["#ffe45e", "#ff5e3a", "#2fe1ff"],
-  ["#fff", "#ff2fd6", "#7dff8a"],
+  ["#b967ff", "#2fe1ff", "#ff2fd6"],
 ];
 
 /* ---------- canvas fx ---------- */
@@ -160,7 +160,7 @@ function spawnSparks(colors, count = 70){
   }
 }
 
-function spawnBlobs(colors, count = 6){
+function spawnBlobs(colors, count = 5){
   for (let i = 0; i < count; i++){
     particles.push({
       type: "blob",
@@ -168,9 +168,9 @@ function spawnBlobs(colors, count = 6){
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 0.5,
       vy: (Math.random() - 0.5) * 0.5,
-      size: 70 + Math.random() * 160,
+      size: 70 + Math.random() * 140,
       color: randomItem(colors),
-      opacity: 0.14 + Math.random() * 0.1,
+      opacity: 0.08 + Math.random() * 0.07,
     });
   }
 }
@@ -286,7 +286,6 @@ function applyVisualMode(mode, colors, messageEl){
     case "glitch":
       spawnBlobs(colors, 4);
       messageEl.classList.add("glitch-wrap");
-      messageEl.setAttribute("data-text", messageEl.textContent);
       break;
     case "stamp":
       spawnBlobs(colors, 5);
@@ -298,6 +297,9 @@ function applyVisualMode(mode, colors, messageEl){
 }
 
 function run(){
+  const messageEl = document.getElementById("message");
+  if (!messageEl) return;
+
   particles = [];
   fxRunning = true;
 
@@ -307,23 +309,22 @@ function run(){
   const portal = isPortal ? randomItem(portals) : null;
   const text = portal ? portal.tagline : buildMessage();
 
-  const messageEl = document.getElementById("message");
   const portalBtn = document.getElementById("portal-btn");
 
   messageEl.className = "";
-  messageEl.removeAttribute("data-text");
-  messageEl.style.color = colors[0];
+  messageEl.style.color = "";
 
-  portalBtn.classList.remove("show", "btn-pop");
-  portalBtn.style.removeProperty("--accent");
+  if (portalBtn){
+    portalBtn.classList.remove("show", "btn-pop");
+    portalBtn.style.removeProperty("--accent");
+  }
 
   typeWriter(messageEl, text);
 
   setTimeout(() => {
-    if (mode === "glitch") messageEl.setAttribute("data-text", text);
     applyVisualMode(mode, colors, messageEl);
 
-    if (portal){
+    if (portal && portalBtn){
       portalBtn.textContent = portal.label;
       portalBtn.href = portal.url;
       portalBtn.style.setProperty("--accent", colors[2] || colors[1] || colors[0]);
@@ -332,4 +333,10 @@ function run(){
   }, text.length * 24 + 80);
 }
 
-run();
+try {
+  run();
+} catch (err) {
+  const fallback = document.getElementById("message");
+  if (fallback) fallback.textContent = buildMessage();
+  console.error(err);
+}
