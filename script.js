@@ -58,8 +58,7 @@ const lines = [
 function randomItem(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
 function buildMessage(){
-  const line = randomItem(lines);
-  return tag ? `${line}` : line;
+  return randomItem(lines);
 }
 
 const portals = [
