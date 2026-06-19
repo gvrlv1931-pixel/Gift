@@ -1,108 +1,147 @@
-const messages = [
+const openings = [
+"Adventure has been detected",
+"The mountain reports",
+"A future version of you confirms",
+"The Department has approved",
+"An audit of your plans revealed",
+"The city would like to inform you",
+"After careful review",
+"A wandering pigeon has determined",
+"Your next chapter requires",
+"Control systems report"
+];
 
-"Today optimisation has been suspended. Proceed using instinct.",
+const actions = [
+"one unnecessary detour",
+"a spontaneous decision",
+"more curiosity",
+"less optimisation",
+"one moment of awe",
+"a questionable shortcut",
+"one conversation with a stranger",
+"a scenic route",
+"one tiny rebellion",
+"an unexpected adventure",
+"more trust in yourself",
+"slightly less planning",
+"a pause before solving everything"
+];
 
-"The mountain has reviewed your plans and recommends less planning.",
-
-"You are authorised to leave one thing unfinished.",
-
-"Climb something today. A staircase counts.",
-
-"A future version of you says you're overthinking it.",
-
-"Adventure has been detected within walking distance.",
-
-"Trade one certainty for one possibility.",
-
-"The city is hiding something interesting. Go find it.",
-
-"You may release control of one outcome today.",
-
-"A pigeon has reviewed your life strategy. It recommends snacks.",
-
-"The route with the better story is now preferred.",
-
-"Your next level requires 12% more curiosity.",
-
-"Urgent reminder: not everything needs improving.",
-
-"Look up. This is part of the assignment.",
-
-"The Department of Adventure approves mild recklessness.",
-
-"Take the scenic route. Nobody is grading efficiency.",
-
-"Today's side quest: notice something beautiful.",
-
-"The summit can wait. Enjoy the climb.",
-
-"You are carrying more certainty than required.",
-
-"An unnecessary detour may become a memory."
-
+const endings = [
+"Proceed accordingly.",
+"This is not a drill.",
+"The paperwork has already been filed.",
+"No further explanation will be provided.",
+"The mountain seems confident about this.",
+"Good luck.",
+"Resistance is unnecessary.",
+"The city approves.",
+"Your future self says thanks.",
+"Expiry: midnight."
 ];
 
 const colors = [
-"#ff5e5b",
-"#00e5ff",
-"#f7b801",
-"#ff66c4",
-"#7cff6b",
-"#ffffff"
+"#00E5FF",
+"#FF6EC7",
+"#FFE45E",
+"#7DFF8A",
+"#FFFFFF"
 ];
 
-const animations = [
-"glow",
-"float",
-"shake",
-"slide"
-];
+function randomItem(array) {
+return array[Math.floor(Math.random() * array.length)];
+}
 
-const message =
-messages[Math.floor(Math.random() * messages.length)];
+const color = randomItem(colors);
 
-const color =
-colors[Math.floor(Math.random() * colors.length)];
+const caseNumber =
+Math.floor(Math.random() * 90000) + 10000;
 
-const animation =
-animations[Math.floor(Math.random() * animations.length)];
+const transmission =
 
-const messageBox =
+`${randomItem(openings)}:
+
+${randomItem(actions)}
+
+${randomItem(endings)}`;
+
+document.getElementById("case").textContent =
+CASE #${caseNumber};
+
+const messageElement =
 document.getElementById("message");
 
-messageBox.textContent = message;
-messageBox.style.color = color;
-messageBox.classList.add(animation);
+messageElement.style.color = color;
 
-const particles =
-document.getElementById("particles");
+typeWriter(transmission);
 
-for(let i=0;i<30;i++){
+function typeWriter(text) {
 
-const p = document.createElement("div");
+let i = 0;
 
-p.classList.add("particle");
+const speed = 28;
 
-const size = Math.random()*8+3;
+const timer = setInterval(() => {
 
-p.style.width = size + "px";
-p.style.height = size + "px";
+    messageElement.textContent += text.charAt(i);
 
-p.style.background = color;
+    i++;
 
-p.style.left = Math.random()*100 + "vw";
-p.style.top = Math.random()*100 + "vh";
+    if (i >= text.length) {
+        clearInterval(timer);
+    }
 
-document.body.appendChild(p);
+}, speed);
 
-p.animate(
-[
-    {transform:"translateY(0px)"},
-    {transform:"translateY(-150px)"}
-],
-{
-    duration:4000 + Math.random()*4000,
-    iterations:Infinity
-});
+}
+
+createOrbs(color);
+
+function createOrbs(color) {
+
+for (let i = 0; i < 8; i++) {
+
+    const orb = document.createElement("div");
+
+    orb.className = "orb";
+
+    const size =
+        Math.random() * 250 + 120;
+
+    orb.style.width = size + "px";
+    orb.style.height = size + "px";
+
+    orb.style.background = color;
+
+    orb.style.left =
+        Math.random() * 100 + "vw";
+
+    orb.style.top =
+        Math.random() * 100 + "vh";
+
+    document.body.appendChild(orb);
+
+    orb.animate(
+        [
+            {
+                transform:
+                    `translate(0px,0px)`
+            },
+            {
+                transform:
+                    `translate(${Math.random() * 120 - 60}px,-120px)`
+            },
+            {
+                transform:
+                    `translate(0px,0px)`
+            }
+        ],
+        {
+            duration:
+                10000 + Math.random() * 6000,
+            iterations: Infinity
+        }
+    );
+}
 
 }
