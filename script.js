@@ -57,6 +57,33 @@ const endings = [
   "Go forth and be insufferable in a good way.",
 ];
 
+const personalLines = [
+  "Last orders have been called on your old life — London's already pouring the next round.",
+  "Somewhere a real mountain is filing a formal complaint because you said you'd hike it and then, predictably, did not.",
+  "Your masters degree is staging a small intervention: 'graduate already and stop alphabetising the bar fridge.'",
+  "The crystal pint glass foresees one (1) hair flip so devastating it briefly changes the weather over London.",
+  "You moved in with your mate 'just for a bit' — the office sweepstake on how long 'a bit' actually means is heating up.",
+  "Somewhere, a climbing wall is gently disappointed in you for skipping leg day again. It still thinks you're hot though.",
+  "Breaking news: your hair looked genuinely incredible today and absolutely nobody told you. Consider this the official notice.",
+  "You will manage one (1) Wetherspoons shift today with the quiet, unreasonable dignity of a man with an International Business Management masters.",
+  "London is currently rehearsing how to handle how good you're about to look walking around it.",
+  "A wandering hiking boot, still pristine in its box, sends its regards and mild disappointment.",
+  "The Department of Compliments has approved an emergency dispatch: your hair is doing something incredible right now, act accordingly.",
+  "You're a city boy who owns proper hiking gear purely as a personality prop. The mountains know. They forgive you anyway.",
+  "Somewhere a pint glass clinks itself in celebration — one step closer to London, one step closer to whatever's next.",
+  "The Oracle of Last Orders has spoken: pulling pints today is beneath you and you both know it.",
+  "Your future London flat is already nervous about how much hair product is about to move in.",
+  "A fortune scrawled on a Wetherspoons beer mat predicts: graduation is coming, and so is your villain era.",
+  "Somewhere a colleague's spare room is being prepared. It has no idea what it's signed up for.",
+  "The hills you keep almost-climbing have asked the city to send you back when you're ready. No rush. Bring snacks.",
+  "An International Business Management degree walks into a pub it also happens to manage. The pub is intimidated.",
+  "Your hair has filed for overtime pay given how much work it's been putting in lately. Pay up.",
+  "London called. It wants to know if you're bringing the good jacket or just the personality. Bring both.",
+  "Somewhere a carabiner clips itself shut in solidarity — you'll get up that mountain eventually, probably, maybe.",
+  "You give off main-character energy in a building that primarily serves jugs of cheap lager. Respect.",
+  "A very official-looking certificate is being printed somewhere with your name on it. Try to look surprised.",
+];
+
 const signatures = [
   "— sent via duct tape & defiance",
   "— with love, chaos, and bad decisions",
@@ -69,6 +96,9 @@ const signatures = [
 function randomItem(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
 function buildMessage(){
+  if (Math.random() < 0.5){
+    return `${randomItem(personalLines)} ${randomItem(endings)}`;
+  }
   return `${randomItem(openings)} ${randomItem(subjects)} ${randomItem(actions)}. ${randomItem(endings)}`;
 }
 
