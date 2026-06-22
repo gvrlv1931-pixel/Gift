@@ -113,7 +113,7 @@ const portals = [
   {
     tagline: "Life is meaningless. Feeling hopeless? Press here",
     label: "MAKE IT OK →",
-    url: "https://make-everything.ok.com",
+    url: "https://make-everything-ok.com/",
   },
   {
     tagline: "Bored? Scroll the longest dog known to man.",
