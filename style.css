@@ -269,17 +269,19 @@ body::before{
 
 #cookie-gate{
     position:absolute;
+    inset:0;
     z-index:10;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-    width:min(72vw, 320px);
-    height:min(46vw, 210px);
     display:flex;
     align-items:center;
     justify-content:center;
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
+}
+
+.cookie-visual{
+    position:relative;
+    width:min(72vw, 320px);
+    height:min(46vw, 210px);
 }
 
 .cookie-half{
