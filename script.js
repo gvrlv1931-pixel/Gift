@@ -234,6 +234,28 @@ const lines = [
   "A spoon bent slightly in your kitchen today. No reason. Just felt like it.",
   "Somewhere, a crow held a tiny meeting about your potential.",
   "Today, gravity is 4% more optional than usual, just for you.",
+
+    // evil advice
+  "Reply 'k' and watch the chaos unfold.",
+  "Leave them on read. They'll survive. Probably.",
+  "Order the most expensive thing on the menu and let them figure it out.",
+  "Tell the truth, but at the worst possible moment.",
+  "Don't apologise. Just bring snacks and act like nothing happened.",
+  "Cancel the plan ten minutes before. For fun.",
+  "Take the last slice. Make eye contact while doing it.",
+  "Start the rumour. Watch how fast it comes back to you.",
+  "Say 'we should hang out soon' and never follow up. Classic.",
+  "Let them think you're mad. You're not. It's funnier this way.",
+  "Double text, then triple text, then never explain why.",
+  "Show up late and act like everyone else was early.",
+  "Ghost them for two days, then send a meme like nothing happened.",
+  "Take credit for the good idea. Quietly. Smile a lot.",
+  "Send the risky text. Worst case, it's a great story.",
+  "Tell them 'we'll see' and mean absolutely nothing by it.",
+  "Set the thermostat one degree off and never admit it was you.",
+  "Agree to the plan, then change it once everyone's already committed.",
+  "Let the group chat think you're typing for ten full minutes. Say nothing.",
+  "Borrow it. Never mention returning it. Let time do the talking.",
 ];
 
 
