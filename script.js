@@ -380,7 +380,7 @@ const scratchHints = [
   "Scratch like you mean it.",
   "Something's under there. Go find it.",
   "Don't be gentle.",
-  "Rub it raw.",
+  "Rub it. Harder.",
   "The oracle's shy. Coax it out.",
   "Scratch to summon.",
   "Peel back the secret.",
