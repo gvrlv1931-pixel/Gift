@@ -486,52 +486,20 @@ function safeRun(){
   }
 }
 
-/* ---------- tap-to-crack gate ---------- */
-
-const gate = document.getElementById("cookie-gate");
-
-function openGate(){
-  if (!gate) return;
-  gate.classList.remove("gate-cracking");
-  gate.style.display = "flex";
-}
-
-function crackGate(){
-  if (!gate){
-    safeRun();
-    return;
-  }
-  if (gate.classList.contains("gate-cracking")) return;
-  gate.classList.add("gate-cracking");
-  setTimeout(() => {
-    gate.style.display = "none";
-    safeRun();
-  }, 650);
-}
-
-if (gate){
-  gate.addEventListener("click", crackGate);
-  gate.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " "){
-      e.preventDefault();
-      crackGate();
-    }
-  });
-}
+safeRun();
 
 /* Phones often resume an already-open tab on NFC tap instead of doing a
    fresh navigation, and some browsers restore the page from the
-   back/forward cache without re-running scripts. Reset to a fresh,
-   unopened cookie whenever the page becomes visible again so every tap
-   feels like a new transmission waiting to be cracked open.
+   back/forward cache without re-running scripts. Re-roll whenever the
+   page becomes visible again so every tap feels like a new transmission.
    pageshow and visibilitychange can both fire for the same resume, so
-   debounce them into a single reset. */
+   debounce them into a single re-roll. */
 let resumeDebounce = null;
 function scheduleResume(){
   if (resumeDebounce) clearTimeout(resumeDebounce);
   resumeDebounce = setTimeout(() => {
     resumeDebounce = null;
-    openGate();
+    safeRun();
   }, 80);
 }
 
