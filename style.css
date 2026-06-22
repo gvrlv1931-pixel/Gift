@@ -152,6 +152,11 @@ body::before{
     opacity:.7;
 }
 
+#message-wrap{
+    position:relative;
+    width:100%;
+}
+
 #message{
     margin:0;
     text-align:center;
@@ -166,15 +171,48 @@ body::before{
     text-shadow:0 0 14px rgba(200,16,46,.35), 2px 2px 0 rgba(0,0,0,.6);
 }
 
-#message::after{
-    content:'_';
-    color:var(--accent);
-    animation:cursorBlink 1s step-end infinite;
+/* ---------- scratch-to-reveal coating ---------- */
+
+#scratch-canvas{
+    position:absolute;
+    inset:0;
+    touch-action:none;
+    -webkit-tap-highlight-color:transparent;
+    cursor:crosshair;
+    border-radius:4px;
+    transition:opacity .5s ease;
 }
 
-@keyframes cursorBlink{
-    0%,50%{ opacity:1; }
-    50.01%,100%{ opacity:0; }
+#scratch-canvas.scratch-cleared{
+    opacity:0;
+    pointer-events:none;
+}
+
+#scratch-canvas.scratch-hidden{
+    display:none;
+}
+
+.scratch-hint{
+    position:absolute;
+    inset:0;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-family:'Special Elite', monospace;
+    font-size:clamp(.8rem, 3.2vw, .95rem);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:.85;
+    pointer-events:none;
+    transition:opacity .35s ease;
+}
+
+.scratch-hint.hint-fade{
+    opacity:0;
 }
 
 #portal-btn{

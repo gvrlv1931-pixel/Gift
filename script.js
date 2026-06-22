@@ -369,30 +369,218 @@ function tick(token){
   if (particles.length) requestAnimationFrame(() => tick(token));
 }
 
-/* ---------- typewriter ---------- */
+/* ---------- scratch-to-reveal coating ---------- */
 
-let typeTimer = null;
+const scratchHints = [
+  "Scratch the void.",
+  "Claw it open.",
+  "Reveal your fate. Use your finger.",
+  "Scratch here, coward.",
+  "Uncover it before it changes its mind.",
+  "Scratch like you mean it.",
+  "Something's under there. Go find it.",
+  "Don't be gentle.",
+  "Rub it raw.",
+  "The oracle's shy. Coax it out.",
+  "Scratch to summon.",
+  "Peel back the secret.",
+  "It won't reveal itself. Make it.",
+  "Drag your finger across destiny.",
+  "Scratch. Why so many questions",
+  "The truth is under the foil.",
+  "Get your hands dirty.",
+  "Wake it up.",
+  "Don't be shy. Use those fingers.",
+  "It likes a little pressure.",
+  "Go on. Get what's yours",
+  "Scratch it like you mean it",
+  "Bit of gentle petting never hurt anyone",
+  "Oh yeah. Rub it.",
+  "Drag your finger across. Slow.",
+];
 
-/* runId guards against a stale, in-flight typewriter still ticking
-   after a newer run() has already started (e.g. two resume events
-   firing back-to-back on a phone). Stale ticks become no-ops. */
-function typeWriter(el, text, runId, speed = 22){
-  if (typeTimer) clearInterval(typeTimer);
-  el.textContent = "";
-  let i = 0;
-  typeTimer = setInterval(() => {
-    if (runId !== currentRunId){
-      clearInterval(typeTimer);
-      typeTimer = null;
-      return;
+const scratchCanvas = document.getElementById("scratch-canvas");
+const scratchCtx = scratchCanvas ? scratchCanvas.getContext("2d") : null;
+const scratchHintEl = document.getElementById("scratch-hint");
+
+const SCRATCH_THRESHOLD = 0.55;
+const SCRATCH_BRUSH_RADIUS = 26;
+const SCRATCH_SAMPLE_W = 48;
+const SCRATCH_SAMPLE_H = 28;
+
+const sampleCanvas = document.createElement("canvas");
+sampleCanvas.width = SCRATCH_SAMPLE_W;
+sampleCanvas.height = SCRATCH_SAMPLE_H;
+const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
+
+const scratch = {
+  active: false,
+  cleared: false,
+  moveCount: 0,
+  runId: 0,
+  duo: null,
+};
+
+function sizeScratchCanvas(){
+  const wrap = document.getElementById("message-wrap");
+  const messageEl = document.getElementById("message");
+  if (!wrap || !messageEl || !scratchCanvas || !scratchCtx) return;
+
+  const wrapRect = wrap.getBoundingClientRect();
+  const rect = messageEl.getBoundingClientRect();
+  const width = Math.max(rect.width, 40);
+  const height = Math.max(rect.height, 30);
+  const dpr = window.devicePixelRatio || 1;
+
+  scratchCanvas.style.left = (rect.left - wrapRect.left) + "px";
+  scratchCanvas.style.top = (rect.top - wrapRect.top) + "px";
+  scratchCanvas.style.width = width + "px";
+  scratchCanvas.style.height = height + "px";
+
+  scratchCanvas.width = Math.round(width * dpr);
+  scratchCanvas.height = Math.round(height * dpr);
+  scratchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* brushed-foil scratch coating, tinted with this draw's accent colour */
+function paintScratchCoating(width, height, duo){
+  if (!scratchCtx || !width || !height) return;
+  scratchCtx.clearRect(0, 0, width, height);
+  scratchCtx.globalCompositeOperation = "source-over";
+
+  const grad = scratchCtx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, "#3a3a3a");
+  grad.addColorStop(.5, "#181818");
+  grad.addColorStop(1, "#2e2e2e");
+  scratchCtx.fillStyle = grad;
+  scratchCtx.fillRect(0, 0, width, height);
+
+  scratchCtx.strokeStyle = "rgba(255,255,255,0.06)";
+  scratchCtx.lineWidth = 1;
+  for (let x = -height; x < width; x += 4){
+    scratchCtx.beginPath();
+    scratchCtx.moveTo(x, 0);
+    scratchCtx.lineTo(x + height, height);
+    scratchCtx.stroke();
+  }
+
+  scratchCtx.strokeStyle = duo.fill + "2e";
+  scratchCtx.lineWidth = 1.4;
+  for (let i = 0; i < 5; i++){
+    const y = (height / 5) * i + Math.random() * 6;
+    scratchCtx.beginPath();
+    scratchCtx.moveTo(0, y);
+    scratchCtx.lineTo(width, y + (Math.random() * 10 - 5));
+    scratchCtx.stroke();
+  }
+
+  for (let i = 0; i < 130; i++){
+    const nx = Math.random() * width;
+    const ny = Math.random() * height;
+    scratchCtx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.18)";
+    scratchCtx.fillRect(nx, ny, 1.4, 1.4);
+  }
+
+  scratchCtx.strokeStyle = duo.fill;
+  scratchCtx.lineWidth = 2;
+  scratchCtx.strokeRect(1, 1, width - 2, height - 2);
+}
+
+function scratchAt(x, y){
+  if (!scratchCtx) return;
+  scratchCtx.globalCompositeOperation = "destination-out";
+  scratchCtx.beginPath();
+  scratchCtx.arc(x, y, SCRATCH_BRUSH_RADIUS, 0, Math.PI * 2);
+  scratchCtx.fill();
+}
+
+/* sampled at low res every few moves rather than every frame — a full
+   getImageData() on the real canvas every pointermove is the kind of
+   thing that looks fine on desktop and chugs on a mid-range phone */
+function getClearedRatio(){
+  if (!sampleCtx || !scratchCanvas) return 0;
+  sampleCtx.clearRect(0, 0, SCRATCH_SAMPLE_W, SCRATCH_SAMPLE_H);
+  sampleCtx.drawImage(scratchCanvas, 0, 0, SCRATCH_SAMPLE_W, SCRATCH_SAMPLE_H);
+  const data = sampleCtx.getImageData(0, 0, SCRATCH_SAMPLE_W, SCRATCH_SAMPLE_H).data;
+  let cleared = 0;
+  for (let i = 3; i < data.length; i += 4){
+    if (data[i] < 40) cleared++;
+  }
+  return cleared / (SCRATCH_SAMPLE_W * SCRATCH_SAMPLE_H);
+}
+
+function completeScratch(){
+  if (scratch.cleared || !scratchCanvas) return;
+  scratch.cleared = true;
+  const runId = scratch.runId;
+  scratchCanvas.classList.add("scratch-cleared");
+  setTimeout(() => {
+    if (runId === currentRunId) scratchCanvas.classList.add("scratch-hidden");
+  }, 520);
+}
+
+function hideScratchHint(){
+  if (scratchHintEl) scratchHintEl.classList.add("hint-fade");
+}
+
+function scratchPointFromEvent(e){
+  const rect = scratchCanvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+function handleScratchStart(e){
+  if (!scratchCanvas || scratch.cleared || scratch.runId !== currentRunId) return;
+  scratch.active = true;
+  hideScratchHint();
+  const p = scratchPointFromEvent(e);
+  scratchAt(p.x, p.y);
+  if (e.cancelable) e.preventDefault();
+}
+
+function handleScratchMove(e){
+  if (!scratchCanvas || !scratch.active || scratch.cleared || scratch.runId !== currentRunId) return;
+  const p = scratchPointFromEvent(e);
+  scratchAt(p.x, p.y);
+  scratch.moveCount++;
+  if (scratch.moveCount % 5 === 0 && getClearedRatio() >= SCRATCH_THRESHOLD){
+    completeScratch();
+  }
+  if (e.cancelable) e.preventDefault();
+}
+
+function handleScratchEnd(){
+  scratch.active = false;
+}
+
+if (scratchCanvas){
+  scratchCanvas.addEventListener("pointerdown", handleScratchStart);
+  window.addEventListener("pointermove", handleScratchMove);
+  window.addEventListener("pointerup", handleScratchEnd);
+  window.addEventListener("pointercancel", handleScratchEnd);
+  window.addEventListener("resize", () => {
+    if (!scratch.cleared && scratch.runId === currentRunId && scratch.duo){
+      sizeScratchCanvas();
+      paintScratchCoating(scratchCanvas.clientWidth, scratchCanvas.clientHeight, scratch.duo);
     }
-    el.textContent += text.charAt(i);
-    i++;
-    if (i >= text.length){
-      clearInterval(typeTimer);
-      typeTimer = null;
-    }
-  }, speed);
+  });
+}
+
+function setupScratch(runId, duo){
+  if (!scratchCanvas || !scratchCtx) return;
+  scratchCanvas.classList.remove("scratch-cleared", "scratch-hidden");
+  scratch.cleared = false;
+  scratch.active = false;
+  scratch.moveCount = 0;
+  scratch.runId = runId;
+  scratch.duo = duo;
+
+  sizeScratchCanvas();
+  paintScratchCoating(scratchCanvas.clientWidth, scratchCanvas.clientHeight, duo);
+
+  if (scratchHintEl){
+    scratchHintEl.textContent = randomItem(scratchHints);
+    scratchHintEl.classList.remove("hint-fade");
+  }
 }
 
 /* ---------- card entrance modes ---------- */
@@ -488,7 +676,8 @@ function run(){
   pendingVisualTimeout = setTimeout(() => {
     if (runId !== currentRunId) return;
 
-    typeWriter(messageEl, text, runId);
+    messageEl.textContent = text;
+    setupScratch(runId, duo);
 
     if (portal && portalBtn){
       portalBtn.textContent = portal.label;
