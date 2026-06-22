@@ -375,8 +375,7 @@ function typeWriter(el, text, runId, speed = 22){
 
 /* ---------- card entrance modes ---------- */
 
-const cardModes = ["drop", "shake", "explode", "fly", "fade", "glitch", "crack"];
-const crumbColors = ["#c8923f", "#a4702a", "#e8c27a"];
+const cardModes = ["drop", "shake", "explode", "fly", "fade", "glitch"];
 const flyOrigins = [
   { x: "-130vw", y: "-40vh", r: "-50deg" },
   { x: "130vw", y: "-30vh", r: "55deg" },
@@ -390,7 +389,7 @@ function applyCardAnimation(mode, duo, card){
   document.body.style.setProperty("--line", duo.line);
   particles = [];
 
-  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "card-glitch", "card-crack", "pulse-glow");
+  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "card-glitch", "pulse-glow");
   card.style.removeProperty("--fly-x");
   card.style.removeProperty("--fly-y");
   card.style.removeProperty("--fly-r");
@@ -422,12 +421,6 @@ function applyCardAnimation(mode, duo, card){
       break;
     case "fade":
       card.classList.add("card-fade");
-      break;
-    case "crack":
-      card.classList.add("card-crack");
-      spawnBurst(randomItem(crumbColors), 14);
-      fxToken++;
-      tick(fxToken);
       break;
   }
 }
@@ -493,20 +486,52 @@ function safeRun(){
   }
 }
 
-safeRun();
+/* ---------- tap-to-crack gate ---------- */
+
+const gate = document.getElementById("cookie-gate");
+
+function openGate(){
+  if (!gate) return;
+  gate.classList.remove("gate-cracking");
+  gate.style.display = "flex";
+}
+
+function crackGate(){
+  if (!gate){
+    safeRun();
+    return;
+  }
+  if (gate.classList.contains("gate-cracking")) return;
+  gate.classList.add("gate-cracking");
+  setTimeout(() => {
+    gate.style.display = "none";
+    safeRun();
+  }, 650);
+}
+
+if (gate){
+  gate.addEventListener("click", crackGate);
+  gate.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      crackGate();
+    }
+  });
+}
 
 /* Phones often resume an already-open tab on NFC tap instead of doing a
    fresh navigation, and some browsers restore the page from the
-   back/forward cache without re-running scripts. Re-roll whenever the
-   page becomes visible again so every tap feels like a new transmission.
+   back/forward cache without re-running scripts. Reset to a fresh,
+   unopened cookie whenever the page becomes visible again so every tap
+   feels like a new transmission waiting to be cracked open.
    pageshow and visibilitychange can both fire for the same resume, so
-   debounce them into a single re-roll. */
+   debounce them into a single reset. */
 let resumeDebounce = null;
 function scheduleResume(){
   if (resumeDebounce) clearTimeout(resumeDebounce);
   resumeDebounce = setTimeout(() => {
     resumeDebounce = null;
-    safeRun();
+    openGate();
   }, 80);
 }
 
