@@ -375,7 +375,7 @@ const scratchHints = [
   "Scratch the void.",
   "Claw it open.",
   "Reveal your fate. Use your finger.",
-  "Scratch here, coward.",
+  "Scratch here. If you dare.",
   "Uncover it before it changes its mind.",
   "Scratch like you mean it.",
   "Something's under there. Go find it.",
