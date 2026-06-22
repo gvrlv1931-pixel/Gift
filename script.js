@@ -399,25 +399,12 @@ const scratchHints = [
   "Drag your finger across. Slow.",
 ];
 
-/* scrawled into the coating itself, barely legible through the grime —
-   not the polite instructional hint, the dirtier subtext underneath it */
-const scratchTexturePhrases = [
-  "GET FILTHY",
-  "DON'T BE GENTLE",
-  "RUB IT RAW",
-  "HARDER",
-  "DIG IN",
-  "MAKE IT HURT",
-  "NO MERCY",
-  "TEAR IT OPEN",
-];
-
 const scratchCanvas = document.getElementById("scratch-canvas");
 const scratchCtx = scratchCanvas ? scratchCanvas.getContext("2d") : null;
 const scratchHintEl = document.getElementById("scratch-hint");
 
 const SCRATCH_THRESHOLD = 0.4;
-const SCRATCH_BRUSH_RADIUS = 36;
+const SCRATCH_BRUSH_RADIUS = 16;
 const SCRATCH_SAMPLE_W = 48;
 const SCRATCH_SAMPLE_H = 28;
 
@@ -431,7 +418,7 @@ const scratch = {
   cleared: false,
   moveCount: 0,
   runId: 0,
-  duo: null,
+  portal: null,
 };
 
 /* canvas sits at inset:0 inside the fixed-size #message-wrap via CSS,
@@ -451,68 +438,14 @@ function sizeScratchCanvas(){
   scratchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
-/* gouged, brutalised scratch coating — raw scraped-up metal, not a
-   polished foil ticket. accent colour shows only as a few violent
-   slash marks; a suggestive phrase is scrawled into the grime itself */
-function paintScratchCoating(width, height, duo){
+/* plain dark coating — flat, no texture noise or scrawled text to
+   distract from the scratching itself */
+function paintScratchCoating(width, height){
   if (!scratchCtx || !width || !height) return;
   scratchCtx.clearRect(0, 0, width, height);
   scratchCtx.globalCompositeOperation = "source-over";
-
-  const base = scratchCtx.createLinearGradient(0, 0, width, height);
-  base.addColorStop(0, "#2b2b2b");
-  base.addColorStop(.5, "#141414");
-  base.addColorStop(1, "#252525");
-  scratchCtx.fillStyle = base;
+  scratchCtx.fillStyle = "#161412";
   scratchCtx.fillRect(0, 0, width, height);
-
-  /* rough gouges, like it's already been scraped at */
-  for (let i = 0; i < 30; i++){
-    const y1 = Math.random() * height;
-    const y2 = y1 + (Math.random() * 18 - 9);
-    scratchCtx.strokeStyle = Math.random() > .5 ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.4)";
-    scratchCtx.lineWidth = .6 + Math.random() * 1.8;
-    scratchCtx.beginPath();
-    scratchCtx.moveTo(0, y1);
-    scratchCtx.lineTo(width, y2);
-    scratchCtx.stroke();
-  }
-
-  /* gritty noise */
-  for (let i = 0; i < 240; i++){
-    const nx = Math.random() * width;
-    const ny = Math.random() * height;
-    scratchCtx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.32)";
-    scratchCtx.fillRect(nx, ny, 1.2, 1.2);
-  }
-
-  /* a handful of violent accent-coloured slashes */
-  scratchCtx.strokeStyle = duo.fill + "55";
-  scratchCtx.lineWidth = 2.4;
-  for (let i = 0; i < 4; i++){
-    const x = Math.random() * width;
-    scratchCtx.beginPath();
-    scratchCtx.moveTo(x, 0);
-    scratchCtx.lineTo(x + (Math.random() * 50 - 25), height);
-    scratchCtx.stroke();
-  }
-
-  /* suggestive phrase scrawled diagonally through the grime, barely legible */
-  const phrase = randomItem(scratchTexturePhrases);
-  scratchCtx.save();
-  scratchCtx.translate(width / 2, height / 2);
-  scratchCtx.rotate(-0.16);
-  scratchCtx.translate(-width / 2, -height / 2);
-  scratchCtx.font = "13px 'Permanent Marker', cursive";
-  scratchCtx.fillStyle = "rgba(255,255,255,0.08)";
-  scratchCtx.textBaseline = "middle";
-  const step = scratchCtx.measureText(phrase).width + 36;
-  for (let y = -20; y < height + 40; y += 30){
-    for (let x = -40; x < width + 40; x += step){
-      scratchCtx.fillText(phrase, x, y);
-    }
-  }
-  scratchCtx.restore();
 }
 
 function scratchAt(x, y){
@@ -546,6 +479,14 @@ function completeScratch(){
   setTimeout(() => {
     if (runId === currentRunId) scratchCanvas.classList.add("scratch-hidden");
   }, 520);
+
+  const portal = scratch.portal;
+  const portalBtn = document.getElementById("portal-btn");
+  if (portal && portalBtn && runId === currentRunId){
+    portalBtn.textContent = portal.label;
+    portalBtn.href = portal.url;
+    portalBtn.classList.add("show", "btn-pop");
+  }
 }
 
 function hideScratchHint(){
@@ -587,24 +528,24 @@ if (scratchCanvas){
   window.addEventListener("pointerup", handleScratchEnd);
   window.addEventListener("pointercancel", handleScratchEnd);
   window.addEventListener("resize", () => {
-    if (!scratch.cleared && scratch.runId === currentRunId && scratch.duo){
+    if (!scratch.cleared && scratch.runId === currentRunId){
       sizeScratchCanvas();
-      paintScratchCoating(scratchCanvas.clientWidth, scratchCanvas.clientHeight, scratch.duo);
+      paintScratchCoating(scratchCanvas.clientWidth, scratchCanvas.clientHeight);
     }
   });
 }
 
-function setupScratch(runId, duo){
+function setupScratch(runId, portal){
   if (!scratchCanvas || !scratchCtx) return;
   scratchCanvas.classList.remove("scratch-cleared", "scratch-hidden");
   scratch.cleared = false;
   scratch.active = false;
   scratch.moveCount = 0;
   scratch.runId = runId;
-  scratch.duo = duo;
+  scratch.portal = portal;
 
   sizeScratchCanvas();
-  paintScratchCoating(scratchCanvas.clientWidth, scratchCanvas.clientHeight, duo);
+  paintScratchCoating(scratchCanvas.clientWidth, scratchCanvas.clientHeight);
 
   if (scratchHintEl){
     scratchHintEl.textContent = randomItem(scratchHints);
@@ -706,13 +647,7 @@ function run(){
     if (runId !== currentRunId) return;
 
     messageEl.textContent = text;
-    setupScratch(runId, duo);
-
-    if (portal && portalBtn){
-      portalBtn.textContent = portal.label;
-      portalBtn.href = portal.url;
-      portalBtn.classList.add("show", "btn-pop");
-    }
+    setupScratch(runId, portal);
   }, 520);
 }
 
