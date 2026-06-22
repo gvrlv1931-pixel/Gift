@@ -375,7 +375,8 @@ function typeWriter(el, text, runId, speed = 22){
 
 /* ---------- card entrance modes ---------- */
 
-const cardModes = ["drop", "shake", "explode", "fly", "fade", "glitch"];
+const cardModes = ["drop", "shake", "explode", "fly", "fade", "glitch", "crack"];
+const crumbColors = ["#c8923f", "#a4702a", "#e8c27a"];
 const flyOrigins = [
   { x: "-130vw", y: "-40vh", r: "-50deg" },
   { x: "130vw", y: "-30vh", r: "55deg" },
@@ -389,7 +390,7 @@ function applyCardAnimation(mode, duo, card){
   document.body.style.setProperty("--line", duo.line);
   particles = [];
 
-  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "card-glitch", "pulse-glow");
+  card.classList.remove("card-drop", "card-shake", "card-explode", "card-fly", "card-fade", "card-glitch", "card-crack", "pulse-glow");
   card.style.removeProperty("--fly-x");
   card.style.removeProperty("--fly-y");
   card.style.removeProperty("--fly-r");
@@ -421,6 +422,12 @@ function applyCardAnimation(mode, duo, card){
       break;
     case "fade":
       card.classList.add("card-fade");
+      break;
+    case "crack":
+      card.classList.add("card-crack");
+      spawnBurst(randomItem(crumbColors), 14);
+      fxToken++;
+      tick(fxToken);
       break;
   }
 }
