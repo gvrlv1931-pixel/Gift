@@ -382,7 +382,7 @@ const scratchCtx = scratchCanvas ? scratchCanvas.getContext("2d") : null;
 const scratchHintEl = document.getElementById("scratch-hint");
 
 const SCRATCH_THRESHOLD = 0.4;
-const SCRATCH_BRUSH_RADIUS = 36;
+const SCRATCH_BRUSH_RADIUS = 16;
 const SCRATCH_SAMPLE_W = 48;
 const SCRATCH_SAMPLE_H = 28;
 
