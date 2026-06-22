@@ -403,8 +403,8 @@ const scratchCanvas = document.getElementById("scratch-canvas");
 const scratchCtx = scratchCanvas ? scratchCanvas.getContext("2d") : null;
 const scratchHintEl = document.getElementById("scratch-hint");
 
-const SCRATCH_THRESHOLD = 0.55;
-const SCRATCH_BRUSH_RADIUS = 26;
+const SCRATCH_THRESHOLD = 0.4;
+const SCRATCH_BRUSH_RADIUS = 36;
 const SCRATCH_SAMPLE_W = 48;
 const SCRATCH_SAMPLE_H = 28;
 
@@ -421,69 +421,73 @@ const scratch = {
   duo: null,
 };
 
+/* canvas sits at inset:0 inside the fixed-size #message-wrap via CSS,
+   so it only needs to match that box's resolution — no JS position
+   math, and nothing to get out of sync when the custom webfont swaps
+   in and reflows the text underneath. */
 function sizeScratchCanvas(){
   const wrap = document.getElementById("message-wrap");
-  const messageEl = document.getElementById("message");
-  if (!wrap || !messageEl || !scratchCanvas || !scratchCtx) return;
+  if (!wrap || !scratchCanvas || !scratchCtx) return;
 
-  const wrapRect = wrap.getBoundingClientRect();
-  const rect = messageEl.getBoundingClientRect();
-  const width = Math.max(rect.width, 40);
-  const height = Math.max(rect.height, 30);
+  const width = Math.max(wrap.clientWidth, 40);
+  const height = Math.max(wrap.clientHeight, 40);
   const dpr = window.devicePixelRatio || 1;
-
-  scratchCanvas.style.left = (rect.left - wrapRect.left) + "px";
-  scratchCanvas.style.top = (rect.top - wrapRect.top) + "px";
-  scratchCanvas.style.width = width + "px";
-  scratchCanvas.style.height = height + "px";
 
   scratchCanvas.width = Math.round(width * dpr);
   scratchCanvas.height = Math.round(height * dpr);
   scratchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
-/* brushed-foil scratch coating, tinted with this draw's accent colour */
+/* brushed-foil scratch coating, tinted with this draw's accent colour —
+   modelled on an actual scratch ticket: silvery metal base, a fine
+   brushed grain, a diagonal glossy sheen, and a scattered star pattern */
 function paintScratchCoating(width, height, duo){
   if (!scratchCtx || !width || !height) return;
   scratchCtx.clearRect(0, 0, width, height);
   scratchCtx.globalCompositeOperation = "source-over";
 
-  const grad = scratchCtx.createLinearGradient(0, 0, width, height);
-  grad.addColorStop(0, "#3a3a3a");
-  grad.addColorStop(.5, "#181818");
-  grad.addColorStop(1, "#2e2e2e");
-  scratchCtx.fillStyle = grad;
+  const base = scratchCtx.createLinearGradient(0, 0, width, height);
+  base.addColorStop(0, "#9a9a9a");
+  base.addColorStop(.45, "#6e6e6e");
+  base.addColorStop(.55, "#65656a");
+  base.addColorStop(1, "#84848a");
+  scratchCtx.fillStyle = base;
   scratchCtx.fillRect(0, 0, width, height);
 
-  scratchCtx.strokeStyle = "rgba(255,255,255,0.06)";
+  /* fine brushed-metal grain */
+  scratchCtx.strokeStyle = "rgba(255,255,255,0.07)";
   scratchCtx.lineWidth = 1;
-  for (let x = -height; x < width; x += 4){
+  for (let x = 0; x < width; x += 2){
     scratchCtx.beginPath();
     scratchCtx.moveTo(x, 0);
-    scratchCtx.lineTo(x + height, height);
+    scratchCtx.lineTo(x, height);
     scratchCtx.stroke();
   }
 
-  scratchCtx.strokeStyle = duo.fill + "2e";
-  scratchCtx.lineWidth = 1.4;
-  for (let i = 0; i < 5; i++){
-    const y = (height / 5) * i + Math.random() * 6;
-    scratchCtx.beginPath();
-    scratchCtx.moveTo(0, y);
-    scratchCtx.lineTo(width, y + (Math.random() * 10 - 5));
-    scratchCtx.stroke();
-  }
+  /* diagonal glossy sheen band, like foil catching the light */
+  const sheen = scratchCtx.createLinearGradient(0, 0, width, height);
+  sheen.addColorStop(0, "rgba(255,255,255,0)");
+  sheen.addColorStop(.38, "rgba(255,255,255,0)");
+  sheen.addColorStop(.5, "rgba(255,255,255,.32)");
+  sheen.addColorStop(.62, "rgba(255,255,255,0)");
+  sheen.addColorStop(1, "rgba(255,255,255,0)");
+  scratchCtx.fillStyle = sheen;
+  scratchCtx.fillRect(0, 0, width, height);
 
-  for (let i = 0; i < 130; i++){
-    const nx = Math.random() * width;
-    const ny = Math.random() * height;
-    scratchCtx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.18)";
-    scratchCtx.fillRect(nx, ny, 1.4, 1.4);
+  /* scattered stars, on-brand with the card's badge motif */
+  scratchCtx.fillStyle = "rgba(255,255,255,0.4)";
+  scratchCtx.font = "13px sans-serif";
+  scratchCtx.textBaseline = "middle";
+  for (let y = 14; y < height; y += 26){
+    const offset = Math.round(y / 26) % 2 === 0 ? 8 : 24;
+    for (let x = offset; x < width; x += 32){
+      scratchCtx.fillText("★", x, y);
+    }
   }
 
   scratchCtx.strokeStyle = duo.fill;
-  scratchCtx.lineWidth = 2;
-  scratchCtx.strokeRect(1, 1, width - 2, height - 2);
+  scratchCtx.lineWidth = 3;
+  scratchCtx.strokeRect(1.5, 1.5, width - 3, height - 3);
 }
 
 function scratchAt(x, y){

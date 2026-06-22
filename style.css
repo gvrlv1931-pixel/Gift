@@ -155,6 +155,10 @@ body::before{
 #message-wrap{
     position:relative;
     width:100%;
+    min-height:clamp(130px, 34vw, 190px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 #message{
